@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const db = require('../entities/db')
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   if (!req.headers.authorization) {
     return next(new Error('Unauthorized.'))
   }
@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
     return next(new Error('Unauthorized.'))
   }
 
-  const user = db('user').where('identifier', token.identifier).first()
+  const user = await db('user').where('identifier', token.identifier).first()
 
   if (!user) {
     return next(new Error('Invalid auth token.'))
