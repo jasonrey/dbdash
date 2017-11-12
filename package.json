@@ -1,7 +1,7 @@
 {
   "name": "dbdash",
   "version": "1.0.0",
-  "description": "Dynamic DB Dashboard with direct integration.",
+  "description": "Dynamic DB Dashboard with direct integration. Admin server and panel side of things.",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -20,7 +20,10 @@
     "start": "npm run server:production",
     "server:dev": "nodemon -w server server",
     "server:production": "NODE_ENV=production node server",
-    "docs": "apidoc -i server -o docs -f .js"
+    "docs": "apidoc -i server -o docs -f .js",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:refresh": "npm run migrate:rollback && npm run migrate"
   },
   "browserslist": [
     "last 2 versions",
@@ -39,8 +42,10 @@
     "compression": "^1.7.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "glob": "^7.1.2",
+    "jsonwebtoken": "^8.1.0",
     "knex": "^0.14.0",
     "mysql": "^2.15.0",
     "vue": "^2.5.3"

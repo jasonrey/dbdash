@@ -23,5 +23,6 @@
   "editor.detectIndentation": false,
   "editor.trimAutoWhitespace": true,
   "files.trimTrailingWhitespace": true,
-  "files.trimFinalNewlines": true
+  "files.trimFinalNewlines": true,
+  "eslint.enable": false
 }
