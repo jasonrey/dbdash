@@ -9,6 +9,6 @@ app.set('env', process.env.NODE_ENV)
 
 app.use(cookieParser())
 
-app.use('/', require('./routes'))
+app.use('/', require('./../routes'))
 
 module.exports = app

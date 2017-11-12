@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   let token
 
   try {
-    token = jwt.verify(authToken, process.env.APP_SECRET)
+    token = jwt.verify(authToken, process.env.APP_SECRETKEY)
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       return next(new Error('Auth token expired.'))

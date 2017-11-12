@@ -1,9 +1,11 @@
+const path = require('path')
+
 require('dotenv').config({
-  path: '../.env'
+  path: path.resolve(__dirname, '../.env')
 })
 
-if (!process.env.APP_SECRET) {
-  throw new Error('APP_SECRET not defined.')
+if (!process.env.APP_SECRETKEY) {
+  throw new Error('APP_SECRETKEY not defined.')
 }
 
 const app = require('./entities/app')
