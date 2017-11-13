@@ -23,7 +23,8 @@
     "docs": "apidoc -i server -o docs -f .js",
     "migrate": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
-    "migrate:refresh": "npm run migrate:rollback && npm run migrate"
+    "migrate:refresh": "npm run migrate:rollback && npm run migrate",
+    "generate:key": "node -e \"console.log('-----'); console.log('Paste the generated key in the APP_SECRETKEY in your .env file'); console.log(); console.log('APP_SECRETKEY=' + require('crypto').randomBytes(32).toString('hex')); console.log('-----');\""
   },
   "browserslist": [
     "last 2 versions",

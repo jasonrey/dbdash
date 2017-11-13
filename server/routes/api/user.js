@@ -89,9 +89,17 @@ router.post('/register', async (req, res, next) => {
 })
 
 router.get('/', authorizeUser, (req, res) => {
-  res.json({
-    email: req.user.email
+  const token = jwt.sign({
+    identifier: req.user.identifier
+  }, process.env.APP_SECRETKEY, {
+    expiresIn: 60 * 60 * 24 * 30
   })
+
+  res.json({
+    email: req.user.email,
+    token
+  })
+
   res.end()
 })
 
