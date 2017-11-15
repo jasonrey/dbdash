@@ -6,7 +6,7 @@ const authorizeRole = require('../../../middlewares/authorizeRole')
 const requiredFields = require('../../../middlewares/requiredFields')
 
 router.put('/',
-  authorizeRole.project(['owner', 'admin']),
+  authorizeRole.dashboard(['owner', 'admin']),
   requiredFields(['email', 'role']),
   async (req, res, next) => {
     if (req.body.role === 'owner') {
@@ -25,9 +25,9 @@ router.put('/',
       user = await db('user').where('id', newUserId).first()
     }
 
-    await db('projectUser')
+    await db('dashboardUser')
       .insert({
-        projectId: req.project.id,
+        dashboardId: req.dashboard.id,
         userId: user.id,
         role: req.body.role,
         createdBy: req.user.id
@@ -42,22 +42,22 @@ router.put('/',
 
 router.post('/:userId',
   requiredFields(['role']),
-  authorizeRole.project(['owner', 'admin']),
+  authorizeRole.dashboard(['owner', 'admin']),
   async (req, res, next) => {
-    const projectUser = await db('projectUser')
+    const dashboardUser = await db('dashboardUser')
       .where('userId', req.params.userId)
-      .where('projectId', req.project.id)
+      .where('dashboardId', req.dashboard.id)
       .first()
 
-    if (!projectUser) {
+    if (!dashboardUser) {
       return next(new Error('No such user.'))
     }
 
-    if (projectUser.role === 'owner') {
+    if (dashboardUser.role === 'owner') {
       return next(new Error('Cannot change owner\'s role.'))
     }
 
-    if (projectUser.role === 'admin' && req.projectUser.role !== 'owner') {
+    if (dashboardUser.role === 'admin' && req.dashboardUser.role !== 'owner') {
       return next(new Error('Only owner can change admin\'s role.'))
     }
 
@@ -65,9 +65,9 @@ router.post('/:userId',
       return next(new Error('Cannot set user role as owner.'))
     }
 
-    await db('projectUser')
+    await db('dashboardUser')
       .where('userId', req.params.userId)
-      .where('projectId', req.project.id)
+      .where('dashboardId', req.dashboard.id)
       .update('role', req.body.role)
 
     res.json({
@@ -80,23 +80,27 @@ router.post('/:userId',
 router.delete('/:userId',
   authorizeRole.project(['owner', 'admin']),
   async (req, res, next) => {
-    const projectUser = await db('projectUser')
+    const dashboardUser = await db('dashboardUser')
       .where('userId', req.params.userId)
-      .where('projectId', req.project.id)
+      .where('dashboardId', req.dashboard.id)
       .first()
 
-    if (projectUser.role === 'owner') {
-      return next(new Error('Cannot delete project owner.'))
+    if (dashboardUser.role === 'owner') {
+      return next(new Error('Cannot delete dashboard owner.'))
     }
 
-    if (projectUser.role === 'admin' && req.projectUser.role !== 'onwer') {
-      return next(new Error('Only project owner can delete admins.'))
+    if (dashboardUser.role === 'admin' && req.dashboardUser.role !== 'onwer') {
+      return next(new Error('Only dashboard owner can delete admins.'))
     }
 
     await Promise.all([
-      db('projectUser')
+      db('dashboardUser')
         .where('userId', req.params.userId)
-        .where('projectId', req.project.id)
+        .where('dashboardId', req.dashboard.id)
+        .del(),
+      db('dashboardUserData')
+        .where('userId', req.params.userId)
+        .where('dashboardId', req.dashboard.id)
         .del()
     ])
 
@@ -111,13 +115,13 @@ router.delete('/:userId',
 user.use('/user', router)
 
 user.get('/users',
-  authorizeRole.project(['owner', 'admin']),
+  authorizeRole.dashboard(['owner', 'admin']),
   async (req, res, next) => {
-    const users = await db('projectUser')
-      .select('user.email', 'projectUser.role')
-      .leftJoin('project', 'project.id', 'projectUser.projectId')
-      .leftJoin('user', 'user.id', 'projectUser.userId')
-      .where('project.id', req.project.id)
+    const users = await db('dashboardUser')
+      .select('user.email', 'dashboardUser.role')
+      .leftJoin('dashboard', 'dashboard.id', 'dashboardUser.dashboardId')
+      .leftJoin('user', 'user.id', 'dashboardUser.userId')
+      .where('dashboard.id', req.dashboard.id)
 
     res.json(users)
   })
