@@ -10,7 +10,9 @@
   "author": "JSON object <jsonobject@outlook.com>",
   "license": "MIT",
   "scripts": {
+    "pretest": "node cli/pretest && npm run migrate",
     "test": "ava",
+    "posttest": "node cli/posttest",
     "lint": "npm run lint:js",
     "lint:js": "standard",
     "build": "gulp build",
@@ -74,6 +76,7 @@
     "pug": "^2.0.0-rc.4",
     "sass-loader": "^6.0.6",
     "standard": "^10.0.3",
+    "supertest": "^3.0.0",
     "vinyl-named": "^1.1.0",
     "vue-loader": "^13.5.0",
     "vue-template-compiler": "^2.5.3",
