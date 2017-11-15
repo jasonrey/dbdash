@@ -10,9 +10,9 @@
   "author": "JSON object <jsonobject@outlook.com>",
   "license": "MIT",
   "scripts": {
-    "pretest": "node cli/pretest && npm run migrate",
+    "pretest": "NODE_ENV=test node cli/pretest && NODE_ENV=test npm run migrate",
     "test": "ava",
-    "posttest": "node cli/posttest",
+    "posttest": "NODE_ENV=test node cli/posttest",
     "lint": "npm run lint:js",
     "lint:js": "standard",
     "build": "gulp build",

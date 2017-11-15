@@ -2,9 +2,14 @@ require('dotenv').config('../../.env')
 
 const {test} = require('ava')
 const request = require('supertest')
-const app = require('../../server/entities/app')
 const jwt = require('jsonwebtoken')
-// const db = require('../../server/entities/db')
+const crypto = require('crypto')
+const app = require('../../server/entities/app')
+const db = require('../../server/entities/db')
+
+test.after(t => {
+  return db.destroy()
+})
 
 test('POST /api/user/register|login - Success', async t => {
   const email = `${Math.random().toString().slice(2)}@${Math.random().toString().slice(2)}.com`
@@ -40,6 +45,11 @@ test('POST /api/user/register|login - Success', async t => {
   t.is(typeof verifyRes.body, 'object')
   t.is(verifyRes.body.email, email)
   t.is(typeof verifyRes.body.token, 'string')
+
+  const user = await db('user').where('email', email).first()
+
+  t.is(user.email, email)
+  t.is(user.password, crypto.createHash('sha512').update(password + user.salt).digest('hex'))
 })
 
 test('POST /api/user/register - Missing data', async t => {
@@ -192,6 +202,8 @@ test('GET /api/user - Token expired', async t => {
   }, process.env.APP_SECRETKEY, {
     expiresIn: 1
   })
+
+  t.log(token)
 
   await new Promise((resolve, reject) => {
     setTimeout(async () => {
