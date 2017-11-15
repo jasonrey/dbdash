@@ -4,7 +4,7 @@ const db = require('../../../entities/db')
 const authorizeRole = require('../../../middlewares/authorizeRole')
 
 dashboard.get('/dashboards',
-  authorizeRole(),
+  authorizeRole.project(),
   async (req, res, next) => {
     const dashboards = await db('dashboard')
       .rightJoin('dashboardUser', 'dashboard.id', 'dashboardUser.dashboardId')
