@@ -124,6 +124,7 @@ user.get('/users',
       .where('dashboard.id', req.dashboard.id)
 
     res.json(users)
-  })
+  }
+)
 
 module.exports = user

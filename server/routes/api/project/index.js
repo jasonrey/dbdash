@@ -40,7 +40,8 @@ router.get('/:projectId',
   async (req, res) => {
     res.json(req.project)
     res.end()
-  })
+  }
+)
 
 router.put('/',
   requiredFields(['name']),
@@ -65,7 +66,8 @@ router.put('/',
 
     res.json(project)
     return res.end()
-  })
+  }
+)
 
 router.post('/:projectId',
   authorizeRole.project(['owner', 'admin']),

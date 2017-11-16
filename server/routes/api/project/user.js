@@ -120,6 +120,7 @@ user.get('/users',
       .where('project.id', req.project.id)
 
     res.json(users)
-  })
+  }
+)
 
 module.exports = user
