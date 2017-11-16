@@ -1,7 +1,11 @@
 doctype html
 html
   head
+    meta(name="viewport", content="minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, width=device-width, user-scalable=no")
     link(rel="stylesheet", type="text/css", href="static/bootstrap.min.css")
     script(src="js/vendor.js")
   body
+    #app.container-fluid
+      router-view
+
     script(src="js/index.js")

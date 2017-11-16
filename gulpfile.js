@@ -82,7 +82,7 @@ gulp.task('build:misc', () => {
 
 gulp.task('watch', sequence('build', ['watch:js', 'watch:css', 'watch:html', 'watch:image']))
 
-gulp.task('watch:js', () => gulp.watch('src/js/**/*.js', ['build:js']))
+gulp.task('watch:js', () => gulp.watch(['src/js/**/*.js', 'src/vue/**/*.vue'], ['build:js']))
 gulp.task('watch:css', () => gulp.watch('src/sass/**/*.sass', ['build:sass']))
 gulp.task('watch:html', () => gulp.watch('src/pug/**/*.pug', ['compile:html']))
 gulp.task('watch:image', () => gulp.watch('src/images/**/*.{png,jpg,gif}', ['build:image']))

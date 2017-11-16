@@ -39,6 +39,9 @@ module.exports = {
                   }]
                 ]
               }
+            },
+            sass: {
+              loader: 'style-loader!css-loader?url=false!sass-loader?indentedSyntax=true'
             }
           },
           postcss: [require('autoprefixer')()]

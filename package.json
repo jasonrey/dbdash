@@ -51,7 +51,9 @@
     "jsonwebtoken": "^8.1.0",
     "knex": "^0.14.0",
     "mysql": "^2.15.0",
-    "vue": "^2.5.3"
+    "style-loader": "^0.19.0",
+    "vue": "^2.5.3",
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
@@ -67,7 +69,6 @@
     "gulp-batch-replace": "^0.0.0",
     "gulp-hashsum": "^1.1.0",
     "gulp-imagemin": "^3.4.0",
-    "gulp-notifiable-task": "^1.1.1",
     "gulp-pug": "^3.3.0",
     "gulp-sass": "^3.1.0",
     "gulp-sequence": "^0.4.6",
