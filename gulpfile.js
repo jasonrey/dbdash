@@ -11,17 +11,22 @@ const imagemin = require('gulp-imagemin')
 const replace = require('gulp-batch-replace')
 const webpack = require('webpack')
 
-require('gulp-notifiable-task')
+gulp.task('default', ['build'])
 
-gulp.notifiableTask('default', ['build'])
-
-gulp.notifiableTask('build', sequence('clean', ['build:js', 'build:css', 'build:image', 'build:misc'], 'hashsum', 'build:html'))
+gulp.task('build', sequence('clean', ['prepare', 'build:js', 'build:css', 'build:image', 'build:misc'], 'hashsum', 'build:html'))
 
 gulp.task('clean', ['clean:js', 'clean:css', 'clean:html'])
 
 gulp.task('clean:js', () => del('dist/js'))
 gulp.task('clean:css', () => del('dist/css'))
 gulp.task('clean:html', () => del('dist/*.html'))
+
+gulp.task('prepare', ['prepare:bootstrap'])
+
+gulp.task('prepare:bootstrap', () => {
+  return gulp.src('node_modules/bootstrap/dist/css/bootstrap.min.css')
+    .pipe(gulp.dest('dist/static'))
+})
 
 gulp.task('hashsum', () => {
   return gulp.src('dist/**/*.{png,gif,jpg,css,js}')
@@ -32,21 +37,21 @@ gulp.task('hashsum', () => {
     }))
 })
 
-gulp.notifiableTask('build:js', () => {
-  gulp.src('src/js/*.js')
+gulp.task('build:js', () => {
+  return gulp.src('src/js/*.js')
     .pipe(named())
-    .pipe(webpackstream(require('./webpack.config.js'), webpack()))
+    .pipe(webpackstream(require('./webpack.config.js'), webpack))
     .pipe(gulp.dest('dist/js'))
 })
 
-gulp.notifiableTask('build:css', () => {
-  gulp.src('src/sass/*.sass')
+gulp.task('build:css', () => {
+  return gulp.src('src/sass/*.sass')
     .pipe(sass())
     .pipe(autoprefixer())
     .pipe(gulp.dest('dist/css'))
 })
 
-gulp.notifiableTask('build:html', sequence('compile:html', 'replacehashsum:html'))
+gulp.task('build:html', sequence('compile:html', 'replacehashsum:html'))
 
 gulp.task('compile:html', () => {
   return gulp.src('src/pug/**/*.pug')
@@ -64,14 +69,14 @@ gulp.task('replacehashsum:html', () => {
     .pipe(gulp.dest('dist'))
 })
 
-gulp.notifiableTask('build:image', () => {
-  gulp.src('src/images/**/*.{png,gif,jpg}')
+gulp.task('build:image', () => {
+  return gulp.src('src/images/**/*.{png,gif,jpg}')
     .pipe(imagemin())
     .pipe(gulp.dest('dist/images'))
 })
 
-gulp.notifiableTask('build:misc', () => {
-  gulp.src('src/assets/**')
+gulp.task('build:misc', () => {
+  return gulp.src('src/assets/**')
     .pipe(gulp.dest('dist/assets'))
 })
 
