@@ -92,7 +92,54 @@ test('POST /api/user/register - Missing password', async t => {
   t.is(res.body.message, 'Insufficient data.')
 })
 
-test.todo('POST /api/user/register - Email exist')
+test('POST /api/user/register - Email exist, correct password', async t => {
+  const email = `${Math.random().toString().slice(2)}@${Math.random().toString().slice(2)}.com`
+  const password = Math.random().toString().slice(2)
+
+  await request(app)
+    .post('/api/user/register')
+    .send({
+      email,
+      password
+    })
+
+  const {identifier} = await db('user').where('email', email).first()
+
+  const res = await request(app)
+    .post('/api/user/register')
+    .send({
+      email,
+      password
+    })
+
+  const decoded = jwt.verify(res.body.token, process.env.APP_SECRETKEY)
+
+  t.is(decoded.identifier, identifier)
+})
+
+test('POST /api/user/register - Email exist, wrong password', async t => {
+  const email = `${Math.random().toString().slice(2)}@${Math.random().toString().slice(2)}.com`
+  const password = Math.random().toString().slice(2)
+
+  await request(app)
+    .post('/api/user/register')
+    .send({
+      email,
+      password
+    })
+
+  const res = await request(app)
+    .post('/api/user/register')
+    .send({
+      email,
+      password: Math.random().toString().slice(2)
+    })
+
+  t.is(res.status, 400)
+  t.is(typeof res.body, 'object')
+  t.is(typeof res.body.message, 'string')
+  t.is(res.body.message, 'Incorrect credentials.')
+})
 
 test('POST /api/user/login - Missing data', async t => {
   const res = await request(app)
