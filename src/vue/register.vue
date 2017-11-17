@@ -15,16 +15,46 @@
 </template>
 
 <script>
+import api from '../library/api.js'
+
 export default {
+  name: 'Register',
   data() {
     return {
       email: '',
       password: '',
-      confirmpassword: ''
+      confirmpassword: '',
+
+      loading: false
     }
   },
   methods: {
     register() {
+      console.log(this.password !== this.confirmpassword
+        || !this.email.trim()
+        || !this.password.trim())
+      if (this.password !== this.confirmpassword
+        || !this.email.trim()
+        || !this.password.trim()
+      ) {
+        return
+      }
+
+      this.loading = true
+
+      api.post('user/register', {
+        email: this.email,
+        password: this.password
+      })
+        .then(res => {
+          console.log(res)
+          api.auth = res.token
+        })
+        .catch(() => {
+        })
+        .then(() => {
+          this.loading = false
+        })
     }
   }
 }
