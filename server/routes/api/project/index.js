@@ -52,15 +52,18 @@ router.put('/',
       userId: req.user.id
     })
 
-    const project = await db('project').where('id', projectId)
+    const project = await db('project').where('id', projectId).first()
 
     project.meta = {}
 
     await db('projectUser').insert({
       projectId,
       userId: req.user.id,
-      role: 'owner'
+      role: 'owner',
+      createdBy: req.user.id
     })
+
+    project.role = 'owner'
 
     res.json(project)
     return res.end()
