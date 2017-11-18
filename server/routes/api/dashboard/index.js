@@ -8,8 +8,6 @@ const authorizeUser = require('../../../middlewares/authorizeUser')
 const authorizeRole = require('../../../middlewares/authorizeRole')
 const requiredFields = require('../../../middlewares/requiredFields')
 
-router.use('/', authorizeUser)
-
 router.param('dashboardId', async (req, res, next, id) => {
   const [dashboard, meta] = await Promise.all([
     db('dashboard')
@@ -123,6 +121,6 @@ glob.sync(path.resolve(__dirname, './*'))
   .filter(file => path.basename(file) !== 'index.js')
   .map(file => router.use('/:dashboardId', require(file)))
 
-dashboard.use('/dashboard', router)
+dashboard.use('/dashboard', authorizeUser, router)
 
 module.exports = dashboard

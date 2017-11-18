@@ -9,8 +9,6 @@ const authorizeUser = require('../../../middlewares/authorizeUser')
 const authorizeRole = require('../../../middlewares/authorizeRole')
 const requiredFields = require('../../../middlewares/requiredFields')
 
-router.use('/', authorizeUser)
-
 router.param('projectId', async (req, res, next, id) => {
   const [project, meta] = await Promise.all([
     db('project')
@@ -117,16 +115,19 @@ glob.sync(path.resolve(__dirname, './*'))
   .filter(file => path.basename(file) !== 'index.js')
   .map(file => router.use('/:projectId', require(file)))
 
-project.use('/project', router)
+project.use('/project', authorizeUser, router)
 
-project.get('/projects', async (req, res, next) => {
-  const projects = await db('projectUser')
-    .select('project.*', 'projectUser.role')
-    .leftJoin('project', 'projectUser.projectId', 'project.id')
-    .orderBy('project.created', 'desc')
+project.get('/projects',
+  authorizeUser,
+  async (req, res, next) => {
+    const projects = await db('projectUser')
+      .select('project.*', 'projectUser.role')
+      .leftJoin('project', 'projectUser.projectId', 'project.id')
+      .orderBy('project.createdAt', 'desc')
 
-  res.json(projects)
-  res.end()
-})
+    res.json(projects)
+    res.end()
+  }
+)
 
 module.exports = project
