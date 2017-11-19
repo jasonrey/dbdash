@@ -1,38 +1,47 @@
 <template lang="pug">
-#register.row.justify-content-center.align-items-center
-  .col-sm-8.col-md-6
-    form(@submit.prevent="register")
+#register.container.pt-2
+  .row.justify-content-center.align-items-center
+    form.card.card-body.bg-light.rounded-0.col-sm-8.col-md-6(@submit.prevent="submit")
+      .alert.alert-warning(v-show="error") {{ error }}
       .form-group
-        input.form-control(placeholder="Email", v-model="email")
+        input.form-control.rounded-0(placeholder="Email", v-model="email")
       .form-group
-        input.form-control(type="password", placeholder="Password", v-model="password")
+        input.form-control.rounded-0(type="password", placeholder="Password", v-model="password")
       .form-group
-        input.form-control(type="password", placeholder="Confirm Password", v-model="confirmpassword")
+        input.form-control.rounded-0(type="password", placeholder="Confirm Password", v-model="confirmpassword")
       hr
       .text-right
         router-link.btn.btn-link(to="/login") Login
-        button.btn.btn-info(type="submit") Register
+        button.btn.btn-info.rounded-0(type="submit", :disabled="loading") Register
 </template>
+
+<style lang="sass">
+body[data-path="/register"]
+  height: 100%
+
+  #app,
+  #register
+    height: 100%
+</style>
 
 <script>
 import api from '../library/api.js'
 
 export default {
   name: 'Register',
-  data() {
+  data () {
     return {
       email: '',
       password: '',
       confirmpassword: '',
 
+      error: '',
+
       loading: false
     }
   },
   methods: {
-    register() {
-      console.log(this.password !== this.confirmpassword
-        || !this.email.trim()
-        || !this.password.trim())
+    submit () {
       if (this.password !== this.confirmpassword
         || !this.email.trim()
         || !this.password.trim()
@@ -47,10 +56,12 @@ export default {
         password: this.password
       })
         .then(res => {
-          console.log(res)
-          api.auth = res.token
+          window.localStorage.setItem('authtoken', res.token)
+
+          this.$router.push('/projects')
         })
-        .catch(() => {
+        .catch(res => {
+          this.error = res.message
         })
         .then(() => {
           this.loading = false

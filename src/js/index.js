@@ -3,51 +3,135 @@ import VueRouter from 'vue-router'
 
 import api from '../library/api.js'
 
+import navbar from '../vue/navbar.vue'
+import index from '../vue/index.vue'
 import login from '../vue/login.vue'
 import register from '../vue/register.vue'
 import projects from '../vue/projects.vue'
+import project from '../vue/project.vue'
+
+import userNav from '../vue/navbar/user.vue'
+import projectNav from '../vue/navbar/project.vue'
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
   routes: [
     {
-      path: '/projects',
-      component: projects
+      path: '/',
+      name: 'index',
+      components: { default: index, navbar },
+      meta: {
+        requiresGuest: true
+      }
     },
     {
       path: '/login',
-      component: login
+      name: 'login',
+      components: { default: login, navbar },
+      meta: {
+        requiresGuest: true
+      }
     },
     {
       path: '/register',
-      component: register
+      name: 'register',
+      components: { default: register, navbar },
+      meta: {
+        requiresGuest: true
+      }
+    },
+    {
+      path: '/projects',
+      components: { default: projects, navbar },
+      children: [
+        {
+          path: '',
+          name: 'projects',
+          component: userNav
+        }
+      ],
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/project/:projectId',
+      components: { default: project, navbar },
+      props: { default: true, navbar: true },
+      children: [
+        {
+          path: '',
+          name: 'project',
+          component: projectNav
+        }
+      ],
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!window.localStorage.getItem('authtoken')) {
+      return next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    }
+
+    return api('user')
+      .then(() => {
+        next()
+      })
+      .catch(() => {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      })
+  }
+
+  if (to.matched.some(record => record.meta.requiresGuest)) {
+    if (!window.localStorage.getItem('authtoken')) {
+      if (to.path === '/') {
+        return next('/login')
+      }
+
+      return next()
+    }
+
+    return api('user')
+      .then(() => {
+        if (to.query.redirect) {
+          return next(to.query.redirect)
+        }
+
+        next('/projects')
+      })
+      .catch(() => {
+        if (to.path === '/') {
+          return next('/login')
+        }
+
+        next()
+      })
+  }
 })
 
 const app = new Vue({
   el: '#app',
   name: 'App',
   router,
-  created () {
-    if (this.$route.path === '/') {
-      api.get('user')
-        .then(() => {
-          this.$router.push('/projects')
-        })
-        .catch(() => {
-          this.$router.push('/login')
-        })
+  watch: {
+    '$route' (to, from) {
+      document.body.dataset.path = to.path
     }
   },
-  methods: {
-    authorize () {
-      api.get('user')
-        .catch(() => {
-          this.$router.push('/login')
-        })
-    }
+  created () {
+    document.body.dataset.path = this.$route.path
   }
 })
 

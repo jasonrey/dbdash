@@ -6,7 +6,9 @@ html
     link(rel="stylesheet", type="text/css", href="css/index.css")
     script(src="js/vendor.js")
   body
-    #app.container-fluid
+    #app
+      router-view(name="navbar")
+
       router-view
 
     script(src="js/index.js")

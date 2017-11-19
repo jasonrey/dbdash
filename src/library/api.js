@@ -1,11 +1,16 @@
 const api = (endpoint, data, options) => {
   const fetchData = {
-    headers: {},
-    body: JSON.stringify(data || {})
+    headers: {}
   }
 
-  if (options.auth) {
-    fetchData.headers.Authorization = `Bearer ${api.auth}`
+  if (data) {
+    fetchData.body = JSON.stringify(data)
+  }
+
+  const authtoken = window.localStorage.getItem('authtoken')
+
+  if (authtoken) {
+    fetchData.headers.Authorization = `Bearer ${authtoken}`
   }
 
   fetchData.headers['Content-Type'] = 'application/json'
@@ -14,11 +19,20 @@ const api = (endpoint, data, options) => {
 
   return window.fetch(`/api/${endpoint}`, fetchData)
     .then(res => {
-      if (res.status === 200) {
-        return res.json()
+      return res.json()
+        .then(subres => {
+          return {
+            status: res.status,
+            body: subres
+          }
+        })
+    })
+    .then(res => {
+      if (res.status !== 200) {
+        throw res.body
       }
 
-      throw res.json()
+      return res.body
     })
 }
 
