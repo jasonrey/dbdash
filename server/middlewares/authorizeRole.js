@@ -1,6 +1,6 @@
 const db = require('../entities/db')
 
-exports.project = roles => {
+exports.project = (roles = []) => {
   return async (req, res, next) => {
     if (!req.user || !req.project) {
       return next(new Error('Unauthorized.'))
@@ -25,7 +25,7 @@ exports.project = roles => {
   }
 }
 
-exports.dashboard = roles => {
+exports.dashboard = (roles = []) => {
   return async (req, res, next) => {
     if (!req.user || !req.dashboard) {
       return next(new Error('Unauthorized.'))
