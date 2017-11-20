@@ -10,5 +10,8 @@ module.exports = {
   },
   migrations: {
     tableName: process.env.DB_MIGRATIONTABLE || '.migrations'
+  },
+  seeds: {
+    directory: './seeds/dev'
   }
 }

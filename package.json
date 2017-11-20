@@ -26,6 +26,7 @@
     "migrate": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
     "migrate:refresh": "npm run migrate:rollback && npm run migrate",
+    "seed": "knex seed:run",
     "generate:key": "node -e \"console.log('-----'); console.log('Paste the generated key in the APP_SECRETKEY in your .env file'); console.log(); console.log('APP_SECRETKEY=' + require('crypto').randomBytes(32).toString('hex')); console.log('-----');\""
   },
   "browserslist": [
@@ -64,6 +65,7 @@
     "babel-preset-env": "^1.6.1",
     "css-loader": "^0.28.7",
     "del": "^3.0.0",
+    "faker": "^4.1.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^4.0.0",
     "gulp-batch-replace": "^0.0.0",
