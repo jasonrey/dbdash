@@ -41,12 +41,20 @@ gulp.task('build:js', () => {
   return gulp.src('src/js/*.js')
     .pipe(named())
     .pipe(webpackstream(require('./webpack.config.js'), webpack))
+    .on('error', function (err) {
+      console.error(err)
+      this.emit('end')
+    })
     .pipe(gulp.dest('dist/js'))
 })
 
 gulp.task('build:css', () => {
   return gulp.src('src/sass/*.sass')
     .pipe(sass())
+    .on('error', function (err) {
+      console.error(err)
+      this.emit('end')
+    })
     .pipe(autoprefixer())
     .pipe(gulp.dest('dist/css'))
 })
@@ -56,6 +64,10 @@ gulp.task('build:html', sequence('compile:html', 'replacehashsum:html'))
 gulp.task('compile:html', () => {
   return gulp.src('src/pug/**/*.pug')
     .pipe(pug())
+    .on('error', function (err) {
+      console.error(err)
+      this.emit('end')
+    })
     .pipe(gulp.dest('dist'))
 })
 
