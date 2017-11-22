@@ -7,7 +7,7 @@ nav.navbar.navbar-light.bg-light.fixed-top
       path(stroke="currentColor", stroke-width="2", stroke-linecap="round", stroke-miterlimit="10", d="M4 7h22M4 15h22M4 23h22")
 
   .collapse.navbar-collapse(:class="{ show: showMobileNav }")
-    router-view
+    router-view(name="navs")
 </template>
 
 <script>

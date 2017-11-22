@@ -9,6 +9,7 @@ import login from '../vue/login.vue'
 import register from '../vue/register.vue'
 import projects from '../vue/projects.vue'
 import project from '../vue/project.vue'
+import dashboard from '../vue/dashboard.vue'
 
 import userNav from '../vue/navbar/user.vue'
 import projectNav from '../vue/navbar/project.vue'
@@ -48,7 +49,9 @@ const router = new VueRouter({
         {
           path: '',
           name: 'projects',
-          component: userNav
+          components: {
+            navs: userNav
+          }
         }
       ],
       meta: {
@@ -63,7 +66,18 @@ const router = new VueRouter({
         {
           path: '',
           name: 'project',
-          component: projectNav
+          components: {
+            navs: projectNav
+          }
+        },
+        {
+          path: 'dashboard/:dashboardId',
+          name: 'dashboard',
+          components: {
+            navs: projectNav,
+            dashboard
+          },
+          props: { dashboard: true }
         }
       ],
       meta: {
