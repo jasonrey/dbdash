@@ -4,9 +4,13 @@
     #sidebar.col-12.col-md-3.col-xl-2.border.border-top-0.border-left-0.border-bottom-0.d-flex.flex-column
       nav
         router-link.d-block.p-2(:to="`/project/${projectId}/dashboard/${dashboard.id}`", active-class="bg-info text-white", v-for="dashboard in dashboards", :key="dashboard.id") {{ dashboard.name }}
+        form(@submit.prevent="saveNewDashboard")
+          .input-group.p-2(v-show="showNewDashboardInput")
+            input.form-control(placeholder="New Dashboard", v-model="newDashboardName", ref="newDashboardInput", @keyup.esc="showNewDashboardInput = false")
+            button.input-group-addon OK
       .row.border.border-left-0.border-right-0.border-bottom-0
         .col-6.p-0
-          button.btn.btn-block +
+          button.btn.btn-block(@click="addDashboard") +
         .col-6.p-0
           button.btn.btn-block #
 
@@ -53,7 +57,12 @@ export default {
   data () {
     return {
       project: null,
-      dashboards: []
+      dashboards: [],
+
+      showNewDashboardInput: false,
+      newDashboardName: '',
+
+      savingNewDashboard: false
     }
   },
   created () {
@@ -68,7 +77,36 @@ export default {
       })
   },
   methods: {
+    addDashboard () {
+      this.showNewDashboardInput = true
+      this.newDashboardName = ''
 
+      this.$nextTick()
+        .then(() => {
+          this.$refs.newDashboardInput.focus()
+        })
+    },
+
+    saveNewDashboard () {
+      if (!this.newDashboardName.trim()) {
+        return
+      }
+
+      this.savingNewDashboard = true
+
+      api.put(`project/${this.projectId}/dashboard`, {
+        name: this.newDashboardName
+      })
+        .then(res => {
+          this.dashboards.push(res)
+
+          this.newDashboardName = ''
+          this.savingNewDashboard = false
+          this.showNewDashboardInput = false
+
+          this.$router.push(`/project/${this.projectId}/dashboard/${res.id}`)
+        })
+    }
   }
 }
 </script>
