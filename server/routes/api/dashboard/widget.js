@@ -4,7 +4,7 @@ const db = require('../../../entities/db')
 const authorizeRole = require('../../../middlewares/authorizeRole')
 
 dashboard.get('/widgets',
-  authorizeRole.project(),
+  authorizeRole.dashboard(),
   async (req, res, next) => {
     const widgets = await db('widget')
       .where('dashboardId', req.dashboard.id)

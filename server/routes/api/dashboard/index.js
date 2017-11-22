@@ -32,50 +32,6 @@ router.param('dashboardId', async (req, res, next, id) => {
   next()
 })
 
-router.put('/',
-  authorizeRole.project(['owner', 'admin']),
-  requiredFields(['name']),
-  async (req, res, next) => {
-    let nextOrdering = await db('dashboard')
-      .max('ordering')
-      .where('projectId', req.project.id)
-
-    if (!nextOrdering) {
-      nextOrdering = 0
-    }
-
-    nextOrdering++
-
-    const [dashboardId] = await db('dashboard')
-      .insert({
-        name: req.body.name,
-        createdBy: req.user.id,
-        ordering: nextOrdering,
-        projectId: req.project.id
-      })
-
-    const [dashboard, projectUsers] = await Promise.all([
-      db('dashboard').where('id', dashboardId).first(),
-      db('projectUser')
-        .where('projectId', req.project.id)
-        .map(row => {
-          return {
-            userId: row.userId,
-            role: row.userId === req.user.id ? 'owner' : row.role,
-            dashboardId,
-            createdBy: req.user.id
-          }
-        })
-    ])
-
-    await db('dashboardUser').insert(projectUsers)
-
-    res.json(dashboard)
-
-    return res.end()
-  }
-)
-
 router.get('/:dashboardId',
   authorizeRole.dashboard(),
   (req, res) => {
