@@ -1,7 +1,7 @@
 const express = require('express')
 const dashboard = express.Router()
-const db = require('../../../entities/db')
-const authorizeRole = require('../../../middlewares/authorizeRole')
+const db = require('../../../../entities/db')
+const authorizeRole = require('../../../../middlewares/authorizeRole')
 
 dashboard.get('/widgets',
   authorizeRole.project(),
