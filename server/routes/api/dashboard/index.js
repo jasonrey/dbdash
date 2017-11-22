@@ -3,9 +3,10 @@ const glob = require('glob')
 const express = require('express')
 const router = express.Router()
 const dashboard = express.Router()
-const db = require('../../../../entities/db')
-const authorizeRole = require('../../../../middlewares/authorizeRole')
-const requiredFields = require('../../../../middlewares/requiredFields')
+const db = require('../../../entities/db')
+const authorizeUser = require('../../../middlewares/authorizeUser')
+const authorizeRole = require('../../../middlewares/authorizeRole')
+const requiredFields = require('../../../middlewares/requiredFields')
 
 router.param('dashboardId', async (req, res, next, id) => {
   const [dashboard, meta] = await Promise.all([
@@ -35,10 +36,9 @@ router.put('/',
   authorizeRole.project(['owner', 'admin']),
   requiredFields(['name']),
   async (req, res, next) => {
-    let {nextOrdering} = await db('dashboard')
-      .max('ordering as nextOrdering')
+    let nextOrdering = await db('dashboard')
+      .max('ordering')
       .where('projectId', req.project.id)
-      .first()
 
     if (!nextOrdering) {
       nextOrdering = 0
@@ -121,21 +121,6 @@ glob.sync(path.resolve(__dirname, './*'))
   .filter(file => path.basename(file) !== 'index.js')
   .map(file => router.use('/:dashboardId', require(file)))
 
-dashboard.use('/dashboard', router)
-
-dashboard.get('/dashboards',
-  authorizeRole.project(),
-  async (req, res, next) => {
-    const dashboards = await db('dashboard')
-      .rightJoin('dashboardUser', 'dashboard.id', 'dashboardUser.dashboardId')
-      .where('dashboard.projectId', req.project.id)
-      .where('dashboardUser.userId', req.user.id)
-      .orderBy('dashboard.ordering')
-
-    res.json(dashboards)
-
-    return res.end()
-  }
-)
+dashboard.use('/dashboard', authorizeUser, router)
 
 module.exports = dashboard

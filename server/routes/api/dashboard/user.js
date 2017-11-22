@@ -1,9 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const user = express.Router()
-const db = require('../../../../entities/db')
-const authorizeRole = require('../../../../middlewares/authorizeRole')
-const requiredFields = require('../../../../middlewares/requiredFields')
+const db = require('../../../entities/db')
+const authorizeRole = require('../../../middlewares/authorizeRole')
+const requiredFields = require('../../../middlewares/requiredFields')
 
 router.put('/',
   authorizeRole.dashboard(['owner', 'admin']),
