@@ -26,7 +26,7 @@ router.post('/login',
     const token = jwt.sign({
       identifier: user.identifier
     }, process.env.APP_SECRETKEY, {
-      expiresIn: process.env.APP_SESSIONLENGTH || 60 * 60 * 24 * 30
+      expiresIn: parseInt(process.env.APP_SESSIONLENGTH) || 60 * 60 * 24 * 30
     })
 
     res.json({
@@ -77,7 +77,7 @@ router.post('/register',
     const token = jwt.sign({
       identifier
     }, process.env.APP_SECRETKEY, {
-      expiresIn: process.env.APP_SESSIONLENGTH || 60 * 60 * 24 * 30
+      expiresIn: parseInt(process.env.APP_SESSIONLENGTH) || 60 * 60 * 24 * 30
     })
 
     res.json({
@@ -92,7 +92,7 @@ router.get('/', authorizeUser, (req, res) => {
   const token = jwt.sign({
     identifier: req.user.identifier
   }, process.env.APP_SECRETKEY, {
-    expiresIn: process.env.APP_SESSIONLENGTH || 60 * 60 * 24 * 30
+    expiresIn: parseInt(process.env.APP_SESSIONLENGTH) || 60 * 60 * 24 * 30
   })
 
   res.json({
