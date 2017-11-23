@@ -72,11 +72,40 @@ router.put('/',
 
 router.post('/:projectId',
   authorizeRole.project(['owner', 'admin']),
-  requiredFields(['name']),
   async (req, res, next) => {
-    await db('project')
-      .where('id', req.project.id)
-      .update('name', req.body.name)
+    if (req.body.name) {
+      await db('project')
+        .where('id', req.project.id)
+        .update('name', req.body.name)
+    }
+
+    if (req.body.meta) {
+      await Promise.all(
+        Object.keys(req.body.meta)
+          .map(async key => {
+            const meta = await db('projectMeta')
+              .where('projectId', req.project.id)
+              .where('field', key)
+              .first()
+
+            if (meta) {
+              await db('projectMeta')
+                .where('projectId', req.project.id)
+                .where('field', key)
+                .update({
+                  value: req.body.meta[key]
+                })
+            } else {
+              await db('projectMeta')
+                .insert({
+                  projectId: req.project.id,
+                  field: key,
+                  value: req.body.meta[key]
+                })
+            }
+          })
+      )
+    }
 
     res.json({
       state: true

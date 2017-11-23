@@ -18,11 +18,19 @@
 
     router-view.col-12.col-md-9.col-xl-10.p-3(name="dashboard", @updateDashboardName="updateDashboardName")
   form#project-settings.container(v-if="$route.name === 'settings'", @submit.prevent="submit")
+    h3.my-3 Project Settings
     .form-group
       label Secret Key
-      input.form-control(v-model="project.identifier", disabled)
+      .input-group
+        input.form-control.rounded-0(:value="project.identifier", disabled)
+        button.input-group-addon.rounded-0.bg-danger.text-white(type="button", @click="resetKey") Reset Key
+    hr
+    .form-group
+      label Bridge Endpoint
+      input.form-control.rounded-0(v-model="project.meta.bridge")
     .form-group.text-right
-      button.btn.btn-light.mr-1(type="button", @click="cancel") Back
+      button.btn.btn-light.mr-1.rounded-0(type="button", @click="cancel") Back
+      button.btn.btn-success.rounded-0 Save
 </template>
 
 <style lang="sass">
@@ -63,7 +71,9 @@ export default {
   props: ['projectId'],
   data () {
     return {
-      project: null,
+      project: {
+        meta: {}
+      },
       dashboards: [],
 
       showNewDashboardInput: false,
@@ -119,8 +129,17 @@ export default {
       this.dashboards.find(dashboard => dashboard.id === id).name = name
     },
 
-    submit () {
+    resetKey () {
+      api.post(`/project/${this.projectId}/reset`)
+        .then(res => {
+          this.project.identifier = res.identifier
+        })
+    },
 
+    submit () {
+      api.post(`/project/${this.projectId}`, {
+        meta: this.project.meta
+      })
     },
 
     cancel () {
