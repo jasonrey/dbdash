@@ -71,6 +71,13 @@ const router = new VueRouter({
           }
         },
         {
+          path: 'settings',
+          name: 'settings',
+          components: {
+            navs: projectNav
+          }
+        },
+        {
           path: 'dashboard/:dashboardId',
           name: 'dashboard',
           components: {

@@ -1,6 +1,6 @@
 <template lang="pug">
 #project
-  .row.no-gutters
+  .row.no-gutters(v-show="$route.name !== 'settings'")
     #sidebar.col-12.col-md-3.col-xl-2.border.border-top-0.border-left-0.border-bottom-0.d-flex.flex-column
       nav
         router-link.d-block.p-2(:to="`/project/${projectId}/dashboard/${dashboard.id}`", active-class="bg-info text-white", v-for="dashboard in dashboards", :key="dashboard.id") {{ dashboard.name }}
@@ -8,14 +8,21 @@
           .input-group.p-2(v-show="showNewDashboardInput")
             input.form-control(placeholder="New Dashboard", v-model="newDashboardName", ref="newDashboardInput", @keyup.esc="showNewDashboardInput = false")
             button.input-group-addon OK
-      .row.border.border-left-0.border-right-0.border-bottom-0
+      .row.border.border-left-0.border-right-0.border-bottom-0.no-gutters
         .col-6.p-0
-          button.btn.btn-block(@click="addDashboard") +
+          button.btn.btn-block.btn-light.rounded-0(@click="addDashboard")
+            img(src="images/plus.svg")
         .col-6.p-0
-          button.btn.btn-block #
+          router-link.btn.btn-block.btn-light.rounded-0(:to="`/project/${projectId}/settings`")
+            img(src="images/settings.svg")
 
-    #dashboard.col-12.col-md-9.col-xl-10.p-3
-      router-view(name="dashboard")
+    router-view.col-12.col-md-9.col-xl-10.p-3(name="dashboard", @updateDashboardName="updateDashboardName")
+  form#project-settings.container(v-if="$route.name === 'settings'", @submit.prevent="submit")
+    .form-group
+      label Secret Key
+      input.form-control(v-model="project.identifier", disabled)
+    .form-group.text-right
+      button.btn.btn-light.mr-1(type="button", @click="cancel") Back
 </template>
 
 <style lang="sass">
@@ -31,9 +38,6 @@ body[data-path^="/project/"]
     @media (min-width: 768px)
       height: 100%
 
-#dashboard
-  overflow-y: auto
-
 #sidebar
   overflow: hidden
 
@@ -45,8 +49,11 @@ body[data-path^="/project/"]
     &:hover
       background-color: rgba(0, 0, 0, 0.1)
 
-</style>
+  .btn
+    img
+      width: 16px
 
+</style>
 
 <script>
 import api from '../library/api.js'
@@ -106,6 +113,18 @@ export default {
 
           this.$router.push(`/project/${this.projectId}/dashboard/${res.id}`)
         })
+    },
+
+    updateDashboardName (id, name) {
+      this.dashboards.find(dashboard => dashboard.id === id).name = name
+    },
+
+    submit () {
+
+    },
+
+    cancel () {
+      this.$router.push(`/project/${this.projectId}`)
     }
   }
 }

@@ -85,6 +85,22 @@ router.post('/:projectId',
   }
 )
 
+router.post('/:projectId/reset',
+  authorizeRole.project(['owner', 'admin']),
+  async (req, res, next) => {
+    const identifier = crypto.randomBytes(32).toString('hex')
+
+    await db('project')
+      .where('id', req.project.id)
+      .update('identifier', identifier)
+
+    res.json({
+      state: true,
+      identifier
+    })
+  }
+)
+
 router.delete('/:projectId',
   authorizeRole.project(),
   requiredFields(['name']),

@@ -82,7 +82,7 @@ gulp.task('replacehashsum:html', () => {
 })
 
 gulp.task('build:image', () => {
-  return gulp.src('src/images/**/*.{png,gif,jpg}')
+  return gulp.src('src/images/**/*.{png,gif,jpg,svg}')
     .pipe(imagemin())
     .pipe(gulp.dest('dist/images'))
 })
@@ -97,4 +97,4 @@ gulp.task('watch', sequence('build', ['watch:js', 'watch:css', 'watch:html', 'wa
 gulp.task('watch:js', () => gulp.watch(['src/js/**/*.js', 'src/library/**/*.js', 'src/vue/**/*.vue'], ['build:js']))
 gulp.task('watch:css', () => gulp.watch('src/sass/**/*.sass', ['build:css']))
 gulp.task('watch:html', () => gulp.watch('src/pug/**/*.pug', ['compile:html']))
-gulp.task('watch:image', () => gulp.watch('src/images/**/*.{png,jpg,gif}', ['build:image']))
+gulp.task('watch:image', () => gulp.watch('src/images/**/*.{png,jpg,gif,svg}', ['build:image']))

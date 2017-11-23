@@ -45,7 +45,7 @@ router.post('/:dashboardId',
   requiredFields(['name']),
   async (req, res) => {
     await db('dashboard')
-      .where('dashboardId', req.dashboard.id)
+      .where('id', req.dashboard.id)
       .update('name', req.body.name)
 
     res.json({
