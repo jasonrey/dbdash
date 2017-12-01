@@ -16,7 +16,7 @@
           router-link.btn.btn-block.btn-light.rounded-0(:to="`/project/${projectId}/settings`")
             img(src="images/settings.svg")
 
-    router-view.col-12.col-md-9.col-xl-10(name="dashboard", @updateDashboardName="updateDashboardName")
+    router-view.col-12.col-md-9.col-xl-10(name="dashboard", @updateDashboardName="updateDashboardName", :project="project")
   form#project-settings.container(v-if="$route.name === 'settings'", @submit.prevent="submit")
     h3.my-3 Project Settings
     .form-group
@@ -31,6 +31,7 @@
     .form-group.text-right
       button.btn.btn-light.mr-1.rounded-0(type="button", @click="cancel") Back
       button.btn.btn-success.rounded-0 Save
+  router-view#modal.w-100.h-100(name="modal", :project="project")
 </template>
 
 <style lang="sass">

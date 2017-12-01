@@ -14,6 +14,8 @@ import dashboard from '../vue/dashboard.vue'
 import userNav from '../vue/navbar/user.vue'
 import projectNav from '../vue/navbar/project.vue'
 
+import widgetSettings from '../vue/modals/widgetSettings.vue'
+
 Vue.use(VueRouter)
 
 const router = new VueRouter({
@@ -85,6 +87,16 @@ const router = new VueRouter({
             dashboard
           },
           props: { dashboard: true }
+        },
+        {
+          path: 'dashboard/:dashboardId/widget/:widgetId/settings',
+          name: 'widgetSettings',
+          components: {
+            navs: projectNav,
+            dashboard,
+            modal: widgetSettings
+          },
+          props: { dashboard: true, modal: true }
         }
       ],
       meta: {

@@ -16,7 +16,7 @@ import tabledata from './widgets/tabledata.vue'
 
 export default {
   name: 'widget',
-  props: ['widget', 'dashboardId'],
+  props: ['widget', 'dashboardId', 'project'],
   components: {
     empty,
     tabledata

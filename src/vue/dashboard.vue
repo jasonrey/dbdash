@@ -21,7 +21,14 @@
       @resized="resizeWidget"
       @moved="moveWidget"
     )
-      widget(:widget="widget", :dashboardId="dashboardId", @remove="removeWidget(widget)", @created="saveAllPositions")
+      widget(
+        :widget="widget"
+        :dashboardId="dashboardId"
+        :project="project"
+        @remove="removeWidget(widget)"
+        @settings="openSettings(widget)"
+        @created="saveAllPositions"
+      )
 
   .px-3
     button.btn.btn-secondary.btn-block.rounded-0(@click="addWidget") +
@@ -33,7 +40,7 @@ import api from '../library/api'
 import widget from './widget.vue'
 
 export default {
-  props: ['dashboardId'],
+  props: ['dashboardId', 'project'],
   components: {
     GridLayout,
     GridItem,
@@ -120,9 +127,15 @@ export default {
     },
 
     removeWidget (widget) {
-      this.widgets.splice(this.widgets.indexOf(widget), 1)
+      if (widget.isNew) {
+        return this.widgets.splice(this.widgets.indexOf(widget), 1)
+      }
 
-      if (!widget.isNew) {
+      const result = window.confirm('Are you sure you want to delete this widget?')
+
+      if (result) {
+        this.widgets.splice(this.widgets.indexOf(widget), 1)
+
         api.del(`widget/${widget.id}`)
           .then(() => this.saveAllPositions())
       }
@@ -161,6 +174,10 @@ export default {
             })
           })
         })
+    },
+
+    openSettings (widget) {
+      this.$router.push(`/project/${this.$route.params.projectId}/dashboard/${this.dashboard.id}/widget/${widget.id}/settings`)
     }
   }
 }
@@ -173,13 +190,13 @@ export default {
 .widget
   overflow-y: auto
 
-.close
-  position: absolute
-  top: 0
-  right: 0
-  width: 30px
-  height: 30px
+  .close
+    position: absolute
+    top: 0
+    right: 0
+    width: 30px
+    height: 30px
 
-.settings
-  right: 30px
+  .settings
+    right: 30px
 </style>
