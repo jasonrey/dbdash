@@ -16,7 +16,7 @@
           router-link.btn.btn-block.btn-light.rounded-0(:to="`/project/${projectId}/settings`")
             img(src="images/settings.svg")
 
-    router-view.col-12.col-md-9.col-xl-10.p-3(name="dashboard", @updateDashboardName="updateDashboardName")
+    router-view.col-12.col-md-9.col-xl-10(name="dashboard", @updateDashboardName="updateDashboardName")
   form#project-settings.container(v-if="$route.name === 'settings'", @submit.prevent="submit")
     h3.my-3 Project Settings
     .form-group

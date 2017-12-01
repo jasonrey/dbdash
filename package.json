@@ -54,6 +54,7 @@
     "mysql": "^2.15.0",
     "style-loader": "^0.19.0",
     "vue": "^2.5.3",
+    "vue-grid-layout": "^2.1.9",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

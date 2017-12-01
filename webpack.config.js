@@ -1,11 +1,11 @@
 const path = require('path')
 const webpack = require('webpack')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   entry: {
     index: './src/js/index.js',
-    vendor: ['vue']
+    vendor: ['vue', 'vue-grid-layout']
   },
   output: {
     filename: '[name].js',
@@ -65,7 +65,8 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js')
+      vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
+      vuegridlayout$: path.resolve(__dirname, 'node_modules/vue-grid-layout/dist/vue-grid-layout.min.js')
     }
   }
 }

@@ -41,12 +41,21 @@ router.param('widgetId', async (req, res, next, id) => {
 })
 
 router.put('/',
-  authorizeRole.dashboard(['owner', 'admin']),
-  requiredFields(['name', 'position', 'type']),
+  requiredFields(['dashboardId', 'name', 'position', 'type']),
   async (req, res, next) => {
-    await db('widget')
+    const dashboard = await db('dashboard')
+      .where('id', req.body.dashboardId)
+      .first()
+
+    req.dashboard = dashboard
+
+    next()
+  },
+  authorizeRole.dashboard(['owner', 'admin']),
+  async (req, res, next) => {
+    const [id] = await db('widget')
       .insert({
-        dashboardId: req.dashboard.id,
+        dashboardId: req.body.dashboardId,
         createdBy: req.user.id,
         name: req.body.name,
         position: req.body.position,
@@ -54,7 +63,8 @@ router.put('/',
       })
 
     res.json({
-      state: true
+      state: true,
+      id
     })
     return res.end()
   }
@@ -81,7 +91,7 @@ router.post('/:widgetId',
     }
 
     await db('widget')
-      .where('widgetId', req.widget.id)
+      .where('id', req.widget.id)
       .update(data)
 
     await Promise.all(
