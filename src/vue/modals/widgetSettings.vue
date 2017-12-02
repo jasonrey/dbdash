@@ -5,12 +5,11 @@ div.modal.w-100.h-100.d-block
   .modal-dialog
     .modal-content.rounded-0
       .modal-header
-        h5.modal-title Widget Settings
+        h5.modal-title(v-if="widget") Widget {{ widgetId }}: {{ widget.name }}
         button.close(type="button", @click="close")
           img(src="images/x.svg")
       .modal-body
-        form(@submit.prevent="submit", v-if="widget")
-          div(:is="widget.type", :widget="widget", :project="project")
+        div(v-if="widget", :is="widget.type", :widget="widget", :project="project", @back="close")
 </template>
 
 <script>
@@ -47,10 +46,6 @@ export default {
 
     close () {
       this.$router.push(`/project/${this.$route.params.projectId}/dashboard/${this.$route.params.dashboardId}`)
-    },
-
-    submit () {
-
     }
   }
 }

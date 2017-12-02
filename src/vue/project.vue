@@ -27,9 +27,10 @@
     hr
     .form-group
       label Bridge Endpoint
-      input.form-control.rounded-0(v-model="project.meta.bridge")
+      input.form-control.rounded-0(v-model="project.meta.bridge", :class="{ 'is-invalid': !project.meta.bridge }", required)
+      .invalid-feedback(v-if="!project.meta.bridge") *Required.
     .form-group.text-right
-      button.btn.btn-light.mr-1.rounded-0(type="button", @click="cancel") Back
+      button.btn.btn-light.mr-1.rounded-0(type="button", @click="back") Back
       button.btn.btn-success.rounded-0 Save
   router-view#modal.w-100.h-100(name="modal", :project="project")
 </template>
@@ -87,6 +88,10 @@ export default {
     api.get(`project/${this.projectId}`)
       .then(res => {
         this.project = res
+
+        if (!this.project.meta.bridge) {
+          this.$router.push(`/project/${this.projectId}/settings`)
+        }
       })
 
     api.get(`project/${this.projectId}/dashboards`)
@@ -141,9 +146,15 @@ export default {
       api.post(`/project/${this.projectId}`, {
         meta: this.project.meta
       })
+
+      this.back()
     },
 
-    cancel () {
+    back () {
+      if (!this.project.meta.bridge || !this.project.meta.bridge.trim()) {
+        return
+      }
+
       this.$router.push(`/project/${this.projectId}`)
     }
   }

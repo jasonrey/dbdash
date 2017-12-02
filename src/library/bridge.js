@@ -1,9 +1,9 @@
 import ajax from './ajax'
 
 class Bridge {
-  constructor (host, identifier) {
-    this.host = host
-    this.identifier = identifier
+  constructor (project) {
+    this.host = project.meta.bridge
+    this.identifier = project.identifier
   }
 
   get (endpoint, data, options = {}) {
@@ -35,4 +35,4 @@ class Bridge {
   }
 }
 
-export default (host, identifier) => new Bridge(host, identifier)
+export default project => new Bridge(project)

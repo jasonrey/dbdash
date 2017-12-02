@@ -20,18 +20,22 @@
       :i="widget.i"
       @resized="resizeWidget"
       @moved="moveWidget"
+      drag-allow-from=".move-handle"
     )
       widget(
         :widget="widget"
         :dashboardId="dashboardId"
         :project="project"
         @remove="removeWidget(widget)"
-        @settings="openSettings(widget)"
         @created="saveAllPositions"
       )
 
   .px-3
-    button.btn.btn-secondary.btn-block.rounded-0(@click="addWidget") +
+    button.btn.btn-secondary.btn-block.rounded-0(@click="addWidget")
+      svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+        line(x1="12" y1="5" x2="12" y2="19")
+        line(x1="5" y1="12" x2="19" y2="12")
+
 </template>
 
 <script>
@@ -50,17 +54,6 @@ export default {
     return {
       dashboard: {},
       widgets: [],
-      addButtonPosition: {
-        id: 'addbutton',
-        x: 0,
-        y: 0,
-        w: 4,
-        h: 1,
-        i: 0,
-        type: 'addbutton',
-        isResizable: false,
-        isDraggable: false
-      },
       index: 0
     }
   },
@@ -95,7 +88,8 @@ export default {
                 w: position.w,
                 h: position.h,
                 i,
-                type: widget.type
+                type: widget.type,
+                meta: widget.meta
               }
             })
           })
@@ -174,10 +168,6 @@ export default {
             })
           })
         })
-    },
-
-    openSettings (widget) {
-      this.$router.push(`/project/${this.$route.params.projectId}/dashboard/${this.dashboard.id}/widget/${widget.id}/settings`)
     }
   }
 }
@@ -190,13 +180,15 @@ export default {
 .widget
   overflow-y: auto
 
-  .close
+  .actions
     position: absolute
     top: 0
     right: 0
-    width: 30px
-    height: 30px
 
-  .settings
-    right: 30px
+.move-handle
+  position: absolute
+  top: 0
+  left: 4px
+  cursor: move
+  cursor: -webkit-grab
 </style>

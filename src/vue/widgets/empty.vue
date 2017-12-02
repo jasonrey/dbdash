@@ -18,9 +18,7 @@ export default {
   methods: {
     selectType (type) {
       this.widget.type = type
-
-
-      this.$emit('created')
+      this.widget.meta = {}
 
       delete this.widget.isNew
 
@@ -38,12 +36,9 @@ export default {
         .then(res => {
           this.widget.id = res.id
 
-          this.$emit('widgetCreated')
+          this.$emit('created')
         })
     }
   }
 }
 </script>
-
-<style lang="sass">
-</style>

@@ -62,7 +62,10 @@ gulp.task('build:css', () => {
 gulp.task('build:html', sequence('compile:html', 'replacehashsum:html'))
 
 gulp.task('compile:html', () => {
-  return gulp.src('src/pug/**/*.pug')
+  return gulp.src([
+    'src/pug/**/*.pug',
+    '!src/pug/svg/**'
+  ])
     .pipe(pug())
     .on('error', function (err) {
       console.error(err)

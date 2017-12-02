@@ -90,9 +90,11 @@ router.post('/:widgetId',
       data.position = req.body.position
     }
 
-    await db('widget')
-      .where('id', req.widget.id)
-      .update(data)
+    if (data.name || data.position) {
+      await db('widget')
+        .where('id', req.widget.id)
+        .update(data)
+    }
 
     await Promise.all(
       Object.keys(req.body)
