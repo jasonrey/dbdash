@@ -1,4 +1,4 @@
-const ajax = (endpoint, data, options) => {
+const ajax = (endpoint, data, options = {}) => {
   const fetchData = {
     headers: {}
   }
@@ -7,15 +7,11 @@ const ajax = (endpoint, data, options) => {
     fetchData.body = JSON.stringify(data)
   }
 
-  const authtoken = window.localStorage.getItem('authtoken')
-
-  if (authtoken) {
-    fetchData.headers.Authorization = `Bearer ${authtoken}`
-  }
-
-  fetchData.headers['Content-Type'] = 'application/json'
-
   Object.assign(fetchData, options)
+
+  if (!fetchData.headers['Content-Type']) {
+    fetchData.headers['Content-Type'] = 'application/json'
+  }
 
   return window.fetch(endpoint, fetchData)
     .then(res => {
@@ -35,7 +31,5 @@ const ajax = (endpoint, data, options) => {
       return res.body
     })
 }
-
-ajax.auth = ''
 
 export default ajax

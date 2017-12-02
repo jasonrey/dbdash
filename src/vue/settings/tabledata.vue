@@ -11,7 +11,7 @@ export default {
   name: 'tabledata-settings',
   props: ['widget', 'project'],
   created () {
-    bridge(this.project.meta.bridge).get('tables')
+    bridge(this.project.meta.bridge, this.project.identifier).get('tables')
       .then(console.log)
   }
 }

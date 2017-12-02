@@ -1,14 +1,19 @@
 import ajax from './ajax'
 
 class Bridge {
-  constructor (host) {
+  constructor (host, identifier) {
     this.host = host
+    this.identifier = identifier
   }
 
-  get (endpoint, data, options) {
-    return ajax(`${this.host}/${endpoint}`, data, Object.assign({}, options, {
-      method: 'GET'
-    }))
+  get (endpoint, data, options = {}) {
+    if (!options.headers) {
+      options.headers = {}
+    }
+
+    options.headers.Authorization = `Bearer ${this.identifier}`
+
+    return ajax(`${this.host}/${endpoint}`, data, options)
   }
 
   post (endpoint, data, options) {
@@ -30,4 +35,4 @@ class Bridge {
   }
 }
 
-export default host => new Bridge(host)
+export default (host, identifier) => new Bridge(host, identifier)
