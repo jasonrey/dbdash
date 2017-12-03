@@ -2,26 +2,51 @@
 .modal.w-100.h-100.d-block.position-absolute.top-0.left-0
   .overlay(@click="close")
 
-  .modal-dialog
-    .modal-content.rounded-0
+  .modal-dialog.my-0.py-3.overflow-auto.d-flex.flex-column.justify-content-center.h-100
+    form.modal-content.rounded-0(@submit.prevent="submit")
       .modal-header
         h5.modal-title(v-if="widget") Widget {{ widgetId }}: {{ widget.name }}
         button.close(type="button", @click="close")
           img(src="images/x.svg")
-      .modal-body
-        div(v-if="widget", :is="widget.type", :widget="widget", :project="project", @back="close")
+      .modal-body.overflow-auto
+        div(
+          ref="settings"
+          v-if="widget"
+          :is="widget.type"
+          :widget="widget"
+          :project="project"
+          :saving="saving"
+          :form="form"
+          @back="close"
+          @request="request"
+        )
+      .modal-footer
+        hr
+
+        .form-group.text-right
+          button.btn.btn-secondary.rounded-0(type="button", @click="close", :disabled="saving")
+            svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+              line(x1="18" y1="6" x2="6" y2="18")
+              line(x1="6" y1="6" x2="18" y2="18")
+
+          button.btn.btn-success.rounded-0(:disabled="saving")
+            svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+              polyline(points="20 6 9 17 4 12")
 </template>
 
 <script>
 import api from '../../library/api'
+import bridge from '../../library/bridge'
 
 import tabledata from '../settings/tabledata.vue'
+import number from '../settings/number.vue'
 
 export default {
   name: 'widget-settings',
   props: ['widgetId', 'project'],
   components: {
-    tabledata
+    tabledata,
+    number
   },
   watch: {
     '$route' (to, from) {
@@ -33,7 +58,11 @@ export default {
   },
   data () {
     return {
-      widget: null
+      widget: null,
+
+      saving: false,
+
+      form: {}
     }
   },
   methods: {
@@ -46,12 +75,42 @@ export default {
 
     close () {
       this.$router.push(`/project/${this.$route.params.projectId}/dashboard/${this.$route.params.dashboardId}`)
+    },
+
+    request (type, ...value) {
+      if (this[type]) {
+        this[type](...value)
+          .then(res => {
+            this.$refs.settings.$emit('response', type, res)
+          })
+      }
+    },
+
+    getTables () {
+      return bridge(this.project)
+        .get('tables')
+    },
+
+    submit () {
+      this.saving = true
+
+      return api.post(`widget/${this.widget.id}`, this.form)
+        .then(res => {
+          this.saving = false
+
+          this.close()
+
+          return res
+        })
     }
   }
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .modal
   z-index: 1050
+
+.modal-dialog
+  max-height: 100%
 </style>

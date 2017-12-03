@@ -2,8 +2,8 @@
 #dashboard
   grid-layout(
     :layout="widgets"
-    :col-num="4"
-    :row-height="64"
+    :col-num="8"
+    :row-height="32"
     :is-draggable="true"
     :is-resizable="true"
     :vertical-compact="true"
@@ -112,8 +112,8 @@ export default {
         name: 'New Widget',
         x: 0,
         y,
-        w: 4,
-        h: 2,
+        w: 8,
+        h: 4,
         i: ++this.index,
         type: 'empty',
         isNew: true

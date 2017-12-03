@@ -56,13 +56,15 @@
 import api from '../library/api'
 import empty from './widgets/empty.vue'
 import tabledata from './widgets/tabledata.vue'
+import number from './widgets/number.vue'
 
 export default {
   name: 'widget',
   props: ['widget', 'dashboardId', 'project'],
   components: {
     empty,
-    tabledata
+    tabledata,
+    number
   },
   data () {
     return {

@@ -1,6 +1,7 @@
 <template lang="pug">
 .row.p-0.pl-3.m-0
   .col.mb-3.mr-3.border(@click="selectType('tabledata')") Table
+  .col.mb-3.mr-3.border(@click="selectType('number')") Number
 
 </template>
 

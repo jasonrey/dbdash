@@ -1,101 +1,47 @@
 <template lang="pug">
-form(@submit.prevent="submit", v-if="widget")
+.settings(v-if="widget")
   .form-group
     label Table
 
-    select.form-control.rounded-0(v-model="selectedTable", @change="loadColumns")
+    select.form-control.rounded-0(v-model="form.table")
       option(v-for="table in tables", :value="table") {{ table }}
-
-  hr
-
-  .form-group.text-right
-    button.btn.btn-secondary.rounded-0(type="button", @click="$emit('back')", :disabled="saving")
-      svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-        line(x1="18" y1="6" x2="6" y2="18")
-        line(x1="6" y1="6" x2="18" y2="18")
-
-
-    button.btn.btn-success.rounded-0(:disabled="saving")
-      svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-        polyline(points="20 6 9 17 4 12")
 </template>
 
 <script>
-import bridge from '../../library/bridge'
-import api from '../../library/api'
-
 export default {
   name: 'tabledata-settings',
-  props: ['widget', 'project'],
+  props: ['widget', 'project', 'saving', 'form'],
   data () {
     return {
       tables: [],
-      columns: [],
-
-      saving: false,
 
       loadingTables: false,
-      loadingColumns: false,
 
       selectedTable: '',
     }
   },
 
   created () {
-    this.selectedTable = this.widget.meta.table
+    this.$on('response', this.response)
 
-    return Promise.resolve()
-      .then(() => this.loadTables())
-      .then(() => this.loadColumns())
+    this.form.table = this.widget.meta.table
+
+    this.loadingTables = true
+
+    this.$emit('request', 'getTables')
   },
 
   methods: {
-    loadTables () {
-      this.loadingTables = true
-
-      return bridge(this.project)
-        .get('tables')
-        .then(res => {
-          this.tables = res
-
-          return this.$nextTick()
-        })
-        .then(() => {
-          this.loadingTables = false
-        })
+    response (type, ...value) {
+      if (this[type]) {
+        this[type](...value)
+      }
     },
 
-    loadColumns () {
-      this.loadingColumns = true
+    getTables (tables) {
+      this.tables = tables
 
-      return bridge(this.project)
-        .get(`table/${this.selectedTable}/columns`)
-        .then(res => {
-          this.columns = res
-
-          return this.$nextTick()
-        })
-        .then(() => {
-          this.loadingColumns = false
-        })
-    },
-
-    submit () {
-      this.saving = true
-
-      this.widget.meta.table = this.selectedTable
-
-      api.post(`widget/${this.widget.id}`, {
-        table: this.selectedTable
-      })
-        .then(() => {
-          this.saving = false
-
-          return this.$nextTick()
-        })
-        .then(() => {
-          this.$emit('back')
-        })
+      this.loadingTables = false
     }
   }
 }
