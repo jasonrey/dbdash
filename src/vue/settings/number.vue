@@ -2,25 +2,44 @@
 .settings(v-if="widget")
   .form-group
     label Header
-    input.form-control(v-model="form.header")
+    input.form-control.form-control-sm(v-model="form.header")
 
   .form-group
     label Footer
-    input.form-control(v-model="form.footer")
+    input.form-control.form-control-sm(v-model="form.footer")
+
+  .row
+    .form-group.col
+      label Pre-text
+      input.form-control.form-control-sm(v-model="form.pre")
+
+    .form-group.col
+      label Post-text
+      input.form-control.form-control-sm(v-model="form.post")
 
   .form-group
-    label Pre-text
-    input.form-control(v-model="form.pre")
+    label Aggregate Type
 
-  .form-group
-    label Post-text
-    input.form-control(v-model="form.post")
+    select.form-control.form-control-sm.rounded-0(v-model="form.type")
+      option(value="count") Count
+      option(value="count distinct") Count Distinct
+      option(value="sum") Sum
+      option(value="min") Min
+      option(value="max") Max
+      option(value="avg") Average
 
-  .form-group
-    label Table
+  .row
+    .form-group.col
+      label Table
 
-    select.form-control.rounded-0(v-model="form.table")
-      option(v-for="table in tables", :value="table") {{ table }}
+      select.form-control.form-control-sm.rounded-0(v-model="form.table", @change="$emit('request', 'getColumns', form.table)")
+        option(v-for="table in tables", :value="table") {{ table }}
+
+    .form-group.col
+      label Column
+
+      select.form-control.form-control-sm.rounded-0(v-model="form.column")
+        option(v-for="column in columns", :value="column.name") {{ column.name }}
 </template>
 
 <script>
@@ -30,8 +49,10 @@ export default {
   data () {
     return {
       tables: [],
+      columns: [],
 
       loadingTables: false,
+      loadingColumns: false,
 
       selectedTable: '',
     }
@@ -41,10 +62,12 @@ export default {
     this.$on('response', this.response)
 
     this.form.table = this.widget.meta.table
+    this.form.column = this.widget.meta.column
     this.form.pre = this.widget.meta.pre
     this.form.post = this.widget.meta.post
     this.form.header = this.widget.meta.header
     this.form.footer = this.widget.meta.footer
+    this.form.type = this.widget.meta.type || 'count'
 
     this.loadingTables = true
 
@@ -62,6 +85,16 @@ export default {
       this.tables = tables
 
       this.loadingTables = false
+
+      this.loadingColumns = true
+
+      this.$emit('request', 'getColumns', this.form.table || this.tables[0])
+    },
+
+    getColumns (columns) {
+      this.columns = columns
+
+      this.loadingColumns = false
     }
   }
 }

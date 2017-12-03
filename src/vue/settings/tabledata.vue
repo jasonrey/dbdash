@@ -3,7 +3,7 @@
   .form-group
     label Table
 
-    select.form-control.rounded-0(v-model="form.table")
+    select.form-control.form-control-sm.rounded-0(v-model="form.table")
       option(v-for="table in tables", :value="table") {{ table }}
 </template>
 
