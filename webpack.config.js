@@ -1,6 +1,5 @@
 const path = require('path')
 const webpack = require('webpack')
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   entry: {
@@ -14,48 +13,15 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js?$/,
-        include: [
-          path.resolve(__dirname, 'src')
-        ],
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            ['env', {
-              browsers: require('./package.json').browserslist
-            }]
-          ]
-        }
-      },
-      {
         test: /\.vue?$/,
         include: [
           path.resolve(__dirname, 'src')
         ],
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            js: {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  ['env', {
-                    browsers: require('./package.json').browserslist
-                  }]
-                ]
-              }
-            },
-            sass: {
-              loader: 'style-loader!css-loader?url=false!sass-loader?indentedSyntax=true'
-            }
-          },
-          postcss: [require('autoprefixer')()]
-        }
+        loader: 'vue-loader'
       }
     ]
   },
   plugins: [
-    // new UglifyJsPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor'
     }),

@@ -180,11 +180,6 @@ export default {
 .widget
   overflow-y: auto
 
-  .actions
-    position: absolute
-    top: 0
-    right: 0
-
 .move-handle
   position: absolute
   top: 0

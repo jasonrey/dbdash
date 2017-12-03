@@ -1,6 +1,6 @@
 <template lang="pug">
-div.modal.w-100.h-100.d-block
-  .overlay.w-100.h-100(@click="close")
+.modal.w-100.h-100.d-block.position-absolute.top-0.left-0
+  .overlay(@click="close")
 
   .modal-dialog
     .modal-content.rounded-0
@@ -53,14 +53,5 @@ export default {
 
 <style lang="sass">
 .modal
-  position: absolute
-  top: 0
-  left: 0
   z-index: 1050
-
-.overlay
-  position: absolute
-  top: 0
-  left: 0
-  background-color: rgba(0, 0, 0, 0.8)
 </style>

@@ -1,28 +1,65 @@
 <template lang="pug">
-.tabledata
-  .alert.alert-warning(v-if="error === 'missing-table'") No table configured.
+.tabledata.d-flex.flex-column
+  .alert.alert-warning.m-0(v-if="error === 'missing-table'") No table configured.
     =" "
     router-link.alert-link(:to="`/project/${$route.params.projectId}/dashboard/${$route.params.dashboardId}/widget/${widget.id}/settings`") Configure this widget.
 
-  .table-wrapper.w-100.h-100.overflow-hidden(v-show="!error", ref="table")
-    .table-head-wrapper.w-100(:style="{ transform: 'translateX(-' + tableBodyLeft + 'px)' }")
-      table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0
+  .col.w-100.h-100(v-show="!error", ref="table")
+    .position-absolute.top-0.left-0.w-100.overflow-hidden
+      table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0(:style="{ transform: 'translateX(-' + tableBodyLeft + 'px)' }")
         thead.thead-light
           tr
             th(v-for="column in columns", :key="column.name") {{ column.name }}
-    .table-body-wrapper.w-100.overflow-auto(:style="{ top: tableBodyTop + 'px' }", @scroll="scrollTableBody")
+
+    .position-absolute.top-0.left-0.bottom-0.w-100.overflow-auto(:style="{ top: tableBodyTop + 'px' }", @scroll="scrollTableBody")
       table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0
         tbody
           tr(v-for="record in records", :key="record._tablekey", :data-key="record._tablekey")
             td(v-for="column in columns", :key="record._tablekey + column.name", :data-key="record._tablekey + '-' + column.name") {{ record[column.name] }}
+
+    .overlay.d-flex.align-items-center.justify-content-center.text-white(v-if="loading") Loading
+
+  .row.mt-2.mx-0(v-if="!error")
+    .col
+
+    .small.my-auto Total: {{ total }}
+
+    .form-group.mx-3.my-0.row
+      label.small.my-auto Limit:
+      select.form-control-sm.ml-2.col(v-model.number="limit", @change="init")
+        option(value="10") 10
+        option(value="20") 20
+        option(value="30") 30
+        option(value="50") 50
+        option(value="100") 100
+
+    .row.mx-0
+      button.btn.btn-sm.btn-light.rounded-0.border(@click="prev")
+        svg(width="16" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+          polyline(points="15 18 9 12 15 6")
+      .d-flex.align-items-center.px-3.small.bg-light.border.border-left-0.border-right-0 {{ page }} / {{ maxPages }}
+      button.btn.btn-sm.btn-light.rounded-0.border(@click="next")
+        svg(width="16" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+          polyline(points="9 18 15 12 9 6")
+
 </template>
 
 <script>
+import api from '../../library/api'
 import bridge from '../../library/bridge'
 
 export default {
   name: 'tabledata-widget',
   props: ['widget', 'project'],
+  computed: {
+    maxPages () {
+      return Math.ceil(this.total / this.limit)
+    },
+
+    offset () {
+      return (this.page - 1) * this.limit
+    }
+  },
   data () {
     return {
       error: '',
@@ -30,29 +67,71 @@ export default {
       total: 0,
 
       limit: 10,
-      offset: 0,
       sort: '',
       order: '',
+      page: 1,
 
       primary: [],
       columns: [],
       records: [],
 
       tableBodyTop: 0,
-      tableBodyLeft: 0
+      tableBodyLeft: 0,
+
+      paginationThrottle: null,
+
+      loading: false
     }
   },
   created () {
     this.init()
   },
+  watch: {
+    '$route' (to, from) {
+      if (from.name === 'widgetSettings' && parseInt(from.params.widgetId) === this.widget.id) {
+        this.getWidget()
+          .then(() => this.init())
+      }
+    }
+  },
   methods: {
     init () {
+      this.error = ''
+
       if (!this.widget.meta.table) {
         this.error = 'missing-table'
         return
       }
 
       return Promise.resolve()
+        .then(() => this.reset())
+        .then(() => this.loadTable())
+        .then(() => this.reflowTable())
+    },
+
+    getWidget () {
+      return api(`widget/${this.widget.id}`)
+        .then(res => {
+          this.widget.meta = res.meta
+        })
+    },
+
+    reset () {
+      this.columns = []
+      this.primary = []
+      this.records = []
+      this.tableBodyTop = 0
+      this.tableBodyLeft = 0
+      this.total = 0
+      this.page = 1
+
+      return this.$nextTick()
+    },
+
+    loadTable () {
+      this.loading = true
+
+      return this.$nextTick()
         .then(() => bridge(this.project).get(`table/${this.widget.meta.table}/columns`))
         .then(res => {
           this.columns = res
@@ -62,18 +141,27 @@ export default {
         .then(() => this.getTotal())
         .then(() => this.getData())
         .then(() => this.$nextTick())
+        .then(() => this.reflowTable())
+        .then(() => {
+          this.loading = false
+        })
+    },
+
+    reflowTable () {
+      return Promise.resolve()
         .then(() => {
           this.tableBodyTop = this.$refs.table.querySelector('thead').offsetHeight
 
           const ths = [...this.$refs.table.querySelectorAll('thead th')]
           const tds = [...this.$refs.table.querySelectorAll('tbody tr td')].slice(0, ths.length)
 
-          ths.map(th => th.style.width = '')
-          tds.map(td => td.style.width = '')
+          ths.map(th => th.style.width = 'auto')
+          tds.map(td => td.style.width = 'auto')
 
-          return this.$nextTick().then(() => ({
-            ths, tds
-          }))
+          return this.$nextTick()
+            .then(() => ({
+              ths, tds
+            }))
         })
         .then(({ths, tds}) => ({
           ths,
@@ -89,6 +177,8 @@ export default {
             ths[index].style.width = width + 'px'
             tds[index].style.width = width + 'px'
           })
+
+          return this.$nextTick()
         })
     },
 
@@ -121,26 +211,36 @@ export default {
 
     scrollTableBody (event) {
       this.tableBodyLeft = event.target.scrollLeft
+    },
+
+    prev () {
+      clearTimeout(this.paginationThrottle)
+
+      this.page = Math.max(1, this.page - 1)
+
+      this.loading = true
+
+      this.paginationThrottle = setTimeout(() => {
+        this.loadTable()
+      }, 500)
+    },
+
+    next () {
+      clearTimeout(this.paginationThrottle)
+
+      this.page = Math.min(this.maxPages, this.page + 1)
+
+      this.loading = true
+
+      this.paginationThrottle = setTimeout(() => {
+        this.loadTable()
+      }, 500)
     }
   }
 }
 </script>
 
 <style lang="sass" scoped>
-.table-wrapper
-  position: absolute
-  top: 0
-  left: 0
-
-.table-head-wrapper,
-.table-body-wrapper
-  position: absolute
-  top: 0
-  left: 0
-
-.table-body-wrapper
-  bottom: 0
-
 table
   font-size: 12px
   width: auto

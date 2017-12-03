@@ -6,16 +6,10 @@ form(@submit.prevent="submit", v-if="widget")
     select.form-control.rounded-0(v-model="selectedTable", @change="loadColumns")
       option(v-for="table in tables", :value="table") {{ table }}
 
-  .form-group
-    label Column
-
-    select.form-control.rounded-0(v-model="selectedColumn")
-      option(v-for="(columnMeta, column) in columns", :value="column") {{ column }}
-
   hr
 
   .form-group.text-right
-    button.btn.btn-light.rounded-0(type="button", @click="$emit('back')", :disabled="saving")
+    button.btn.btn-secondary.rounded-0(type="button", @click="$emit('back')", :disabled="saving")
       svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
         line(x1="18" y1="6" x2="6" y2="18")
         line(x1="6" y1="6" x2="18" y2="18")
@@ -36,7 +30,7 @@ export default {
   data () {
     return {
       tables: [],
-      columns: {},
+      columns: [],
 
       saving: false,
 
@@ -44,7 +38,6 @@ export default {
       loadingColumns: false,
 
       selectedTable: '',
-      selectedColumn: ''
     }
   },
 
@@ -53,7 +46,7 @@ export default {
 
     return Promise.resolve()
       .then(() => this.loadTables())
-      // .then(() => this.loadColumns())
+      .then(() => this.loadColumns())
   },
 
   methods: {
@@ -83,8 +76,6 @@ export default {
           return this.$nextTick()
         })
         .then(() => {
-          this.selectedColumn = this.selectedColumn || Object.keys(this.columns)[0]
-
           this.loadingColumns = false
         })
     },
@@ -92,12 +83,17 @@ export default {
     submit () {
       this.saving = true
 
+      this.widget.meta.table = this.selectedTable
+
       api.post(`widget/${this.widget.id}`, {
         table: this.selectedTable
       })
         .then(() => {
           this.saving = false
 
+          return this.$nextTick()
+        })
+        .then(() => {
           this.$emit('back')
         })
     }

@@ -9,7 +9,10 @@ const named = require('vinyl-named')
 const del = require('del')
 const imagemin = require('gulp-imagemin')
 const replace = require('gulp-batch-replace')
+const util = require('gulp-util')
 const webpack = require('webpack')
+
+const isProduction = process.env.NODE_ENV === 'production'
 
 gulp.task('default', ['build'])
 
@@ -29,6 +32,10 @@ gulp.task('prepare:bootstrap', () => {
 })
 
 gulp.task('hashsum', () => {
+  if (isProduction) {
+    return true
+  }
+
   return gulp.src('dist/**/*.{png,gif,jpg,css,js}')
     .pipe(hashsum({
       dest: 'dist',
@@ -40,7 +47,7 @@ gulp.task('hashsum', () => {
 gulp.task('build:js', () => {
   return gulp.src('src/js/*.js')
     .pipe(named())
-    .pipe(webpackstream(require('./webpack.config.js'), webpack))
+    .pipe(webpackstream(require('./webpack.' + (process.env.NODE_ENV === 'production' ? 'production' : 'config') + '.js'), webpack))
     .on('error', function (err) {
       console.error(err)
       this.emit('end')
@@ -75,6 +82,10 @@ gulp.task('compile:html', () => {
 })
 
 gulp.task('replacehashsum:html', () => {
+  if (isProduction) {
+    return true
+  }
+
   const sums = require('./dist/hashsum.json')
 
   const replacements = Object.keys(sums).map(sum => [sum, sum + '?' + sums[sum]])
@@ -86,7 +97,7 @@ gulp.task('replacehashsum:html', () => {
 
 gulp.task('build:image', () => {
   return gulp.src('src/images/**/*.{png,gif,jpg,svg}')
-    .pipe(imagemin())
+    .pipe(isProduction ? imagemin() : util.noop())
     .pipe(gulp.dest('dist/images'))
 })
 

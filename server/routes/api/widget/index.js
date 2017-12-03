@@ -134,10 +134,8 @@ router.post('/:widgetId',
 router.delete('/:widgetId',
   authorizeRole.dashboard(['admin', 'owner']),
   async (req, res, next) => {
-    await Promise.all([
-      db('widget').where('id', req.widget.id).del(),
-      db('widgetMeta').where('widgetId', req.widget.id).del()
-    ])
+    await db('widgetMeta').where('widgetId', req.widget.id).del()
+    await db('widget').where('id', req.widget.id).del()
 
     res.json({
       state: true
