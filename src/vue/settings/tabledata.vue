@@ -5,12 +5,21 @@
 
     select.form-control.form-control-sm.rounded-0(v-model="form.table")
       option(v-for="table in tables", :value="table") {{ table }}
+
+  .form-group
+    label Conditions
+    conditions(:rule="rule")
 </template>
 
 <script>
+import conditions from './components/conditions.vue'
+
 export default {
   name: 'tabledata-settings',
   props: ['widget', 'project', 'saving', 'form'],
+  components: {
+    conditions
+  },
   data () {
     return {
       tables: [],
@@ -18,6 +27,8 @@ export default {
       loadingTables: false,
 
       selectedTable: '',
+
+      rule: {}
     }
   },
 
