@@ -3,12 +3,12 @@
   .form-group
     label Table
 
-    select.form-control.form-control-sm.rounded-0(v-model="form.table")
+    select.form-control.form-control-sm.rounded-0(v-model="form.table", @change="$emit('request', 'getColumns', form.table)")
       option(v-for="table in tables", :value="table") {{ table }}
 
   .form-group
     label Conditions
-    conditions(:rule="rule")
+    conditions(:rules="rules", :level="0", :columns="columns")
 </template>
 
 <script>
@@ -23,12 +23,14 @@ export default {
   data () {
     return {
       tables: [],
+      columns: [],
+
+      rules: [],
 
       loadingTables: false,
+      loadingColumns: false,
 
-      selectedTable: '',
-
-      rule: {}
+      selectedTable: ''
     }
   },
 
@@ -36,6 +38,9 @@ export default {
     this.$on('response', this.response)
 
     this.form.table = this.widget.meta.table
+    this.rules = this.widget.meta.rules ? JSON.parse(this.widget.meta.rules) : []
+
+    this.form.rules = this.rules
 
     this.loadingTables = true
 
@@ -53,6 +58,16 @@ export default {
       this.tables = tables
 
       this.loadingTables = false
+
+      this.loadingColumns = true
+
+      this.$emit('request', 'getColumns', this.form.table || this.tables[0])
+    },
+
+    getColumns (columns) {
+      this.columns = columns
+
+      this.loadingColumns = false
     }
   }
 }

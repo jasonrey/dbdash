@@ -97,7 +97,15 @@ export default {
     submit () {
       this.saving = true
 
-      return api.post(`widget/${this.widget.id}`, this.form)
+      const formdata = {}
+
+      Object.keys(this.form).map(key => {
+        formdata[key] = typeof this.form[key] === 'object'
+          ? JSON.stringify(this.form[key])
+          : this.form[key]
+      })
+
+      return api.post(`widget/${this.widget.id}`, formdata)
         .then(res => {
           this.saving = false
 
