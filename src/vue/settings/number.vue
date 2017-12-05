@@ -22,7 +22,7 @@
 
     select.form-control.form-control-sm.rounded-0(v-model="form.type")
       option(value="count") Count
-      option(value="count distinct") Count Distinct
+      option(value="countDistinct") Count Distinct
       option(value="sum") Sum
       option(value="min") Min
       option(value="max") Max
@@ -40,16 +40,27 @@
 
       select.form-control.form-control-sm.rounded-0(v-model="form.column")
         option(v-for="column in columns", :value="column.name") {{ column.name }}
+
+  .form-group
+    label Conditions
+    conditions(:rules="rules", :level="0", :columns="columns")
 </template>
 
 <script>
+import conditions from './components/conditions.vue'
+
 export default {
   name: 'number-settings',
   props: ['widget', 'project', 'saving', 'form'],
+  components: {
+    conditions
+  },
   data () {
     return {
       tables: [],
       columns: [],
+
+      rules: [],
 
       loadingTables: false,
       loadingColumns: false,
@@ -60,6 +71,10 @@ export default {
 
   created () {
     this.$on('response', this.response)
+
+    this.rules = this.widget.meta.rules ? JSON.parse(this.widget.meta.rules) : []
+
+    this.form.rules = this.rules
 
     this.form.table = this.widget.meta.table
     this.form.column = this.widget.meta.column

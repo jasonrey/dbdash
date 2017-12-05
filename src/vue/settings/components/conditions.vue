@@ -17,10 +17,10 @@
   .row(:class="{ 'mx-0': level }")
     a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-info(href="javascript:;", @click="addCondition()", v-if="!rules.length") + Condition
     a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-info(href="javascript:;", @click="addCondition('and')", v-if="rules.length") + AND
-    a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-info(href="javascript:;", @click="addCondition('or')", v-if="rules.length") + OR
-    a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-primary(href="javascript:;", @click="addGroup('and')", v-show="rules.length") + AND ()
-    a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-primary(href="javascript:;", @click="addGroup('or')", v-show="rules.length") + OR ()
-    a.ml-3.col-auto.rounded-0.btn.btn-sm.btn-danger(href="javascript:;", @click="removeLastCondition", v-show="(level > 0 && rules.length > 1) || (level === 0 && rules.length)") - Condition
+    a.ml-1.col-auto.rounded-0.btn.btn-sm.btn-info(href="javascript:;", @click="addCondition('or')", v-if="rules.length") + OR
+    a.ml-1.col-auto.rounded-0.btn.btn-sm.btn-primary(href="javascript:;", @click="addGroup('and')", v-show="rules.length") + AND ()
+    a.ml-1.col-auto.rounded-0.btn.btn-sm.btn-primary(href="javascript:;", @click="addGroup('or')", v-show="rules.length") + OR ()
+    a.ml-1.col-auto.rounded-0.btn.btn-sm.btn-danger(href="javascript:;", @click="removeLastCondition", v-show="(level > 0 && rules.length > 1) || (level === 0 && rules.length)") - Condition
 
   .d-block(v-if="rule && (rule.connector === 'and' || rule.connector === 'or')")
     span.badge.badge-secondary.rounded-0 )

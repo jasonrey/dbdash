@@ -6,7 +6,7 @@
 
   .col.row.align-items-center.justify-content-center.m-auto(v-show="!loading")
     .pre {{ pre }}
-    h2.col-auto.my-auto {{ value }}
+    h1.col-auto.my-auto {{ value }}
     .post {{ post }}
 
   p.small.mt-0.mb-2(v-if="footer") {{ footer }}
@@ -14,10 +14,11 @@
 
 <script>
 import api from '../../library/api'
+import bridge from '../../library/bridge'
 
 export default {
   name: 'number-widget',
-  props: ['widget'],
+  props: ['widget', 'project'],
   data () {
     return {
       pre: '',
@@ -42,23 +43,34 @@ export default {
   },
   methods: {
     init () {
-      this.loading = true
-
       this.pre = this.widget.meta.pre
       this.post = this.widget.meta.post
 
       this.header = this.widget.meta.header
       this.footer = this.widget.meta.footer
 
-      this.value = 100
-
-      this.loading = false
+      return this.loadData()
     },
 
     getWidget () {
       return api(`widget/${this.widget.id}`)
         .then(res => {
           this.widget.meta = res.meta
+        })
+    },
+
+    loadData () {
+      this.loading = true
+
+      return bridge(this.project).post(`table/${this.widget.meta.table}/aggregate`, {
+        rules: this.widget.meta.rules,
+        aggregate: this.widget.meta.type,
+        column: this.widget.meta.column
+      })
+        .then(res => {
+          this.value = res.total
+
+          this.loading = false
         })
     }
   }

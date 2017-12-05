@@ -5,19 +5,20 @@
     router-link.alert-link(:to="`/project/${$route.params.projectId}/dashboard/${$route.params.dashboardId}/widget/${widget.id}/settings`") Configure this widget.
 
   .col.w-100.h-100(v-show="!error", ref="table")
-    .position-absolute.top-0.left-0.w-100.overflow-hidden
+    .position-absolute.top-0.left-0.w-100.overflow-hidden(v-if="columns.length && records.length")
       table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0(:style="{ transform: 'translateX(-' + tableBodyLeft + 'px)' }")
         thead.thead-light
           tr
             th(v-for="column in columns", :key="column.name") {{ column.name }}
 
-    .position-absolute.top-0.left-0.bottom-0.w-100.overflow-auto(:style="{ top: tableBodyTop + 'px' }", @scroll="scrollTableBody")
+    .position-absolute.top-0.left-0.bottom-0.w-100.overflow-auto(:style="{ top: tableBodyTop + 'px' }", @scroll="scrollTableBody", v-if="columns.length && records.length")
       table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0
         tbody
           tr(v-for="record in records", :key="record._tablekey", :data-key="record._tablekey")
             td(v-for="column in columns", :key="record._tablekey + column.name", :data-key="record._tablekey + '-' + column.name") {{ record[column.name] }}
 
     .overlay.d-flex.align-items-center.justify-content-center.text-white(v-if="loading") Loading
+    .d-flex.justify-content-center.align-items-center.alert.alert-warning.h-100(v-if="!loading && (!columns.length || !records.length)") No data.
 
   .row.mt-2.mx-0(v-if="!error")
     .col
@@ -150,7 +151,9 @@ export default {
     reflowTable () {
       return Promise.resolve()
         .then(() => {
-          this.tableBodyTop = this.$refs.table.querySelector('thead').offsetHeight
+          const thead = this.$refs.table.querySelector('thead')
+
+          this.tableBodyTop = thead ? thead.offsetHeight : 0
 
           const ths = [...this.$refs.table.querySelectorAll('thead th')]
           const tds = [...this.$refs.table.querySelectorAll('tbody tr td')].slice(0, ths.length)
@@ -166,7 +169,7 @@ export default {
         .then(({ths, tds}) => ({
           ths,
           tds,
-          widths: ths.map((el, index) => Math.max(el.offsetWidth, tds[index].offsetWidth))
+          widths: ths.map((el, index) => Math.max(el.offsetWidth, tds[index] ? tds[index].offsetWidth : 0))
         }))
         .then(({ths, tds, widths}) => {
           const sum = widths.reduce((total, width) => total += width, 0)
@@ -175,7 +178,10 @@ export default {
 
           widths.map((width, index) => {
             ths[index].style.width = width + 'px'
-            tds[index].style.width = width + 'px'
+
+            if (tds[index]) {
+              tds[index].style.width = width + 'px'
+            }
           })
 
           return this.$nextTick()
@@ -183,19 +189,21 @@ export default {
     },
 
     getTotal () {
-      return bridge(this.project).get(`table/${this.widget.meta.table}/records/count`)
+      return bridge(this.project).post(`table/${this.widget.meta.table}/aggregate`, {
+        rules: this.widget.meta.rules,
+        aggregate: 'count'
+      })
         .then(res => {
           this.total = res.total
         })
     },
 
     getData () {
-      const payload = encodeURIComponent(JSON.stringify({
+      return bridge(this.project).post(`table/${this.widget.meta.table}/records`, {
+        rules: this.widget.meta.rules,
         limit: this.limit,
         offset: this.offset
-      }))
-
-      return bridge(this.project).get(`table/${this.widget.meta.table}/records?payload=${payload}`)
+      })
         .then(res => {
           this.records = res.map(record => {
             record._tablekey = this.primary.length

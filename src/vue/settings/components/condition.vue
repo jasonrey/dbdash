@@ -27,7 +27,10 @@
       option(value="is not null") IS NOT NULL
 
   .col.pr-0
-    input.form-control.form-control-sm(v-model="rule.value")
+    .input-group
+      input.form-control.form-control-sm(v-model="rule.value")
+      span.input-group-btn
+        button.btn.btn-sm(type="button", :class="{ 'btn-outline-success': !rule.raw, 'btn-success': rule.raw }", @click="rule.raw = !rule.raw") Raw
 </template>
 
 <script>
