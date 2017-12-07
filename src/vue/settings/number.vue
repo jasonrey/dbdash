@@ -17,32 +17,33 @@
       label Post-text
       input.form-control.form-control-sm(v-model="form.post")
 
-  .form-group
-    label Aggregate Type
+  label.d-block Query
 
-    select.form-control.form-control-sm.rounded-0(v-model="form.type")
-      option(value="count") Count
-      option(value="countDistinct") Count Distinct
-      option(value="sum") Sum
-      option(value="min") Min
-      option(value="max") Max
-      option(value="avg") Average
+  .row.mb-3
+    .col-auto
+      label.badge.badge-secondary.rounded-0 SELECT
 
-  .row
-    .form-group.col
-      label Table
+    .col-auto.p-0
+      select.form-control.form-control-sm.rounded-0(v-model="form.type")
+        option(value="count") Count
+        option(value="countDistinct") Count Distinct
+        option(value="sum") Sum
+        option(value="min") Min
+        option(value="max") Max
+        option(value="avg") Average
 
-      select.form-control.form-control-sm.rounded-0(v-model="form.table", @change="$emit('request', 'getColumns', form.table)")
-        option(v-for="table in tables", :value="table") {{ table }}
-
-    .form-group.col
-      label Column
-
+    .col-auto
       select.form-control.form-control-sm.rounded-0(v-model="form.column")
         option(v-for="column in columns", :value="column.name") {{ column.name }}
 
+    .col-auto.p-0
+      label.badge.badge-secondary.rounded-0 FROM
+
+    .col-auto
+      select.form-control.form-control-sm.rounded-0(v-model="form.table", @change="$emit('request', 'getColumns', form.table)")
+        option(v-for="table in tables", :value="table") {{ table }}
+
   .form-group
-    label Conditions
     conditions(:rules="rules", :level="0", :columns="columns")
 </template>
 

@@ -2,6 +2,7 @@
 .form-group.row.mr-0
   .col-1.pr-0
     span.badge.badge-secondary.rounded-0(v-if="index && rule.connector") {{ rule.connector | uppercase }}
+    span.badge.badge-secondary.rounded-0(v-if="level === 1 && !index && !rule.connector") WHERE
 
   .col.pr-0
     select.form-control.form-control-sm(v-model="rule.column")
@@ -35,7 +36,7 @@
 
 <script>
 export default {
-  props: ['rule', 'index', 'columns'],
+  props: ['rule', 'index', 'columns', 'level'],
   filters: {
     uppercase: value => value.toUpperCase()
   },
