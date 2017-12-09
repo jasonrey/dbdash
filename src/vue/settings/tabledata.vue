@@ -7,18 +7,24 @@
       option(v-for="table in tables", :value="table") {{ table }}
 
   .form-group
+    label Filters
+    filters(:filters="filters", :columns="columns")
+
+  .form-group
     label Conditions
     conditions(:rules="rules", :level="0", :columns="columns")
 </template>
 
 <script>
 import conditions from './components/conditions.vue'
+import filters from './components/filters.vue'
 
 export default {
   name: 'tabledata-settings',
   props: ['widget', 'project', 'saving', 'form'],
   components: {
-    conditions
+    conditions,
+    filters
   },
   data () {
     return {
@@ -26,6 +32,7 @@ export default {
       columns: [],
 
       rules: [],
+      filters: [],
 
       loadingTables: false,
       loadingColumns: false,
@@ -38,9 +45,12 @@ export default {
     this.$on('response', this.response)
 
     this.form.table = this.widget.meta.table
-    this.rules = this.widget.meta.rules ? JSON.parse(this.widget.meta.rules) : []
 
+    this.rules = this.widget.meta.rules ? JSON.parse(this.widget.meta.rules) : []
     this.form.rules = this.rules
+
+    this.filters = this.widget.meta.filters ? JSON.parse(this.widget.meta.filters) : []
+    this.form.filters = this.filters
 
     this.loadingTables = true
 

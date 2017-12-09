@@ -124,4 +124,7 @@ export default {
 
 .modal-dialog
   max-height: 100%
+
+.modal-header
+  flex-shrink: 0
 </style>

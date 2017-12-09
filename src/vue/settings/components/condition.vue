@@ -1,5 +1,5 @@
 <template lang="pug">
-.form-group.row.mr-0
+.row.mr-0.mb-1
   .col-1.pr-0
     span.badge.badge-secondary.rounded-0(v-if="index && rule.connector") {{ rule.connector | uppercase }}
     span.badge.badge-secondary.rounded-0(v-if="level === 1 && !index && !rule.connector") WHERE
@@ -36,6 +36,7 @@
 
 <script>
 export default {
+  name: 'condition',
   props: ['rule', 'index', 'columns', 'level'],
   filters: {
     uppercase: value => value.toUpperCase()
