@@ -18,6 +18,10 @@ module.exports = {
           path.resolve(__dirname, 'src')
         ],
         loader: 'vue-loader'
+      },
+      {
+        test: /\.css?$/,
+        loader: 'style-loader!css-loader'
       }
     ]
   },

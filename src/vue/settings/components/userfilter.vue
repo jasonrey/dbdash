@@ -1,10 +1,13 @@
 <template lang="pug">
 .tr
   .td.py-1.pr-3
+    input.form-control.form-control-sm(v-model="filter.label")
+
+  .td.py-1.pr-3
     select.form-control.form-control-sm(v-model="filter.type")
       option(value="search") Search
       option(value="datepicker") Datepicker
-      option(value="select") Select
+      option(value="selection") Selection
 
   .td.py-1.pr-3
     select.form-control.form-control-sm(v-model="filter.column")

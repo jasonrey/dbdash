@@ -3,6 +3,7 @@
   .table.table-condensed.mb-1
     .thead
       .tr
+        .th.text-center.py-1.pr-3 Label
         .th.text-center.py-1.pr-3 Type
         .th.text-center.py-1.pr-3 Column
         .th.text-center.py-1.pr-3.w-1 Size
@@ -35,7 +36,7 @@ export default {
   methods: {
     add () {
       this.filters.push({
-        id: `filter-${Math.random()}`,
+        id: `filter-${Math.random().toString().slice(2)}`,
         type: '',
         column: '',
         size: 12

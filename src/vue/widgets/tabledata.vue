@@ -4,6 +4,16 @@
     =" "
     router-link.alert-link(:to="`/project/${$route.params.projectId}/dashboard/${$route.params.dashboardId}/widget/${widget.id}/settings`") Configure this widget.
 
+  .filters.row(v-show="!error")
+    .filter(
+      v-for="filter in filters"
+      :class="'col-' + filter.size"
+      :is="filter.type"
+      :key="filter.id"
+      :filter="filter"
+      @change="change"
+    )
+
   .col.w-100.h-100(v-show="!error", ref="table")
     .position-absolute.top-0.left-0.w-100.overflow-hidden(v-if="columns.length && records.length")
       table.table.table-striped.table-hover.table-sm.table-responsive.table-bordered.m-0(:style="{ transform: 'translateX(-' + tableBodyLeft + 'px)' }")
@@ -55,9 +65,14 @@
 import api from '../../library/api'
 import bridge from '../../library/bridge'
 
+import datepicker from './tabledata/datepicker.vue'
+
 export default {
   name: 'tabledata-widget',
   props: ['widget', 'project'],
+  components: {
+    datepicker
+  },
   computed: {
     maxPages () {
       return Math.ceil(this.total / this.limit)
@@ -82,6 +97,8 @@ export default {
       columns: [],
       records: [],
 
+      filters: [],
+
       tableBodyTop: 0,
       tableBodyLeft: 0,
 
@@ -97,7 +114,7 @@ export default {
     '$route' (to, from) {
       if (from.name === 'widgetSettings' && parseInt(from.params.widgetId) === this.widget.id) {
         this.getWidget()
-          .then(() => this.init())
+          .then(() => this.refreshTable())
       }
     }
   },
@@ -110,10 +127,9 @@ export default {
         return
       }
 
-      return Promise.resolve()
-        .then(() => this.reset())
-        .then(() => this.loadTable())
-        .then(() => this.reflowTable())
+      this.filters = JSON.parse(this.widget.meta.filters || [])
+
+      return this.refreshTable()
     },
 
     getWidget () {
@@ -133,6 +149,13 @@ export default {
       this.page = 1
 
       return this.$nextTick()
+    },
+
+    refreshTable () {
+      return Promise.resolve()
+        .then(() => this.reset())
+        .then(() => this.loadTable())
+        .then(() => this.reflowTable())
     },
 
     loadTable () {
@@ -197,7 +220,8 @@ export default {
     getTotal () {
       return bridge(this.project).post(`table/${this.widget.meta.table}/aggregate`, {
         rules: this.widget.meta.rules,
-        aggregate: 'count'
+        aggregate: 'count',
+        filters: this.filters.filter(item => item.value !== undefined && item.value !== null)
       })
         .then(res => {
           this.total = res.total
@@ -208,7 +232,8 @@ export default {
       return bridge(this.project).post(`table/${this.widget.meta.table}/records`, {
         rules: this.widget.meta.rules,
         limit: this.limit,
-        offset: this.offset
+        offset: this.offset,
+        filters: this.filters.filter(item => item.value !== undefined && item.value !== null)
       })
         .then(res => {
           this.records = res.map(record => {
@@ -249,6 +274,10 @@ export default {
       this.paginationThrottle = setTimeout(() => {
         this.loadTable()
       }, 500)
+    },
+
+    change (filter, event) {
+      this.refreshTable()
     }
   }
 }
