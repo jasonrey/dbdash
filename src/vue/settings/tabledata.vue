@@ -8,7 +8,7 @@
 
   .form-group
     label Filters
-    filters(:filters="filters", :columns="columns")
+    userfilters(:filters="filters", :columns="columns")
 
   .form-group
     label Conditions
@@ -17,14 +17,14 @@
 
 <script>
 import conditions from './components/conditions.vue'
-import filters from './components/filters.vue'
+import userfilters from './components/userfilters.vue'
 
 export default {
   name: 'tabledata-settings',
   props: ['widget', 'project', 'saving', 'form'],
   components: {
     conditions,
-    filters
+    userfilters
   },
   data () {
     return {
